@@ -10,9 +10,9 @@ class AppConstants {
   static const String fontFamily = 'Roboto';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-  static const String webHostedUrl = 'https://orderzila-web.6amtech.com';
+  static const String webHostedUrl = 'https://orderzila.com';
 
-  static const String baseUrl = 'https://orderzila-admin.6amtech.com';
+  static const String baseUrl = 'https://orderzila.com/zila';
   static const String categoryUri = '/api/v1/categories';
   static const String bannerUri = '/api/v1/banners';
   static const String storeItemUri = '/api/v1/items/latest';
