@@ -1,3 +1,7 @@
+import 'package:flutter/cupertino.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
+import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/search/controllers/search_controller.dart' as search;
@@ -7,7 +11,6 @@ import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
-import 'package:sixam_mart/common/widgets/custom_button.dart';
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
@@ -34,12 +37,16 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
   final TextEditingController _searchController = TextEditingController();
   late bool _isLoggedIn;
 
+  List<String> _itemsAndStors = <String>[];
+  bool _showSuggestion = false;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, initialIndex: 0, vsync: this);
     _isLoggedIn = AuthHelper.isLoggedIn();
     Get.find<search.SearchController>().setSearchMode(true, canUpdate: false);
+    Get.find<search.SearchController>().getPopularCategories();
     if(_isLoggedIn) {
       Get.find<search.SearchController>().getSuggestedItems();
     }
@@ -47,6 +54,18 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
     if(widget.queryText!.isNotEmpty) {
       _actionSearch(true, widget.queryText, true);
     }
+  }
+
+  Future<void> _searchSuggestions(String query) async {
+    _itemsAndStors = [];
+    if (query == '') {
+      _showSuggestion = false;
+      _itemsAndStors = [];
+    } else {
+      _showSuggestion = true;
+      _itemsAndStors = await Get.find<search.SearchController>().getSearchSuggestions(query);
+    }
+    setState(() {});
   }
 
   @override
@@ -66,7 +85,9 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
         body: SafeArea(child: Padding(
           padding: ResponsiveHelper.isDesktop(context) ? EdgeInsets.zero : const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
           child: GetBuilder<search.SearchController>(builder: (searchController) {
-            _searchController.text = searchController.searchText!;
+            if(!ResponsiveHelper.isDesktop(context)) {
+              _searchController.text = searchController.searchText!;
+            }
             return Column(children: [
               ResponsiveHelper.isDesktop(context) ? Container(
                 width : double.infinity,
@@ -80,17 +101,22 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                       const SizedBox(height: Dimensions.paddingSizeDefault),
 
                       SizedBox(width: Dimensions.webMaxWidth, child: GetBuilder<search.SearchController>(builder: (searchController) {
-                        _searchController.text = searchController.searchHomeText!;
                         return SearchFieldWidget(
                           controller: _searchController,
+                          radius: 50,
                           hint: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
                               ? 'search_food_or_restaurant'.tr : 'search_item_or_store'.tr,
-                          suffixIcon: searchController.searchHomeText!.isNotEmpty ? Icons.cancel : Icons.search,
+                          suffixIcon: searchController.searchHomeText!.isNotEmpty ? Icons.cancel : CupertinoIcons.search,
                           iconColor: Theme.of(context).disabledColor,
                           filledColor: Theme.of(context).colorScheme.surface,
+                          onChanged: (text) {
+                            _searchSuggestions(text);
+                            searchController.setSearchText(text);
+                          },
                           iconPressed: () {
                             if(searchController.searchHomeText!.isNotEmpty) {
                               _searchController.text = '';
+                              _showSuggestion = false;
                               searchController.setSearchMode(true);
                               searchController.clearSearchHomeText();
                             }else {
@@ -110,9 +136,10 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                width: 160,
+                                width: 200,
                                 color: Colors.transparent,
                                 child: TabBar(
+                                  tabAlignment: TabAlignment.start,
                                   controller: _tabController,
                                   indicatorColor: Theme.of(context).primaryColor,
                                   indicatorWeight: 3,
@@ -144,53 +171,85 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                 ),
               ) : const SizedBox(),
 
-              widget.queryText!.isNotEmpty ? const SizedBox() : Center(child: ResponsiveHelper.isDesktop(context) ? const SizedBox() : SizedBox(width: Dimensions.webMaxWidth, child: Row(children: [
-                const SizedBox(width: Dimensions.paddingSizeSmall),
-                Expanded(child: SearchFieldWidget(
-                  controller: _searchController,
-                  hint: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
-                      ? 'search_food_or_restaurant'.tr : 'search_item_or_store'.tr,
-                  suffixIcon: !searchController.isSearchMode ? Icons.filter_list : Icons.search,
-                  iconPressed: () => _actionSearch(false, _searchController.text.trim(), false),
-                  onSubmit: (text) => _actionSearch(true, _searchController.text.trim(), false),
-                )),
-                CustomButton(
-                  onPressed: () {
+              widget.queryText!.isNotEmpty ? const SizedBox() : Center(child: ResponsiveHelper.isDesktop(context) ? const SizedBox() : Container(
+                width: Dimensions.webMaxWidth,
+                decoration: BoxDecoration(
+                  color: Get.find<ThemeController>().darkTheme ? Colors.black12 : Theme.of(context).cardColor,
+                  boxShadow: Get.find<ThemeController>().darkTheme ? null : [BoxShadow(color: Theme.of(context).disabledColor.withOpacity(0.2), blurRadius: 3, offset: const Offset(0, 5))]
+                ),
+              padding: const EdgeInsets.only(bottom: 5),
+              child: Row(children: [
+
+                IconButton(
+                  onPressed: (){
                     if(searchController.isSearchMode) {
                       Get.back();
                     } else {
+                      _showSuggestion = false;
                       searchController.setSearchMode(true);
                       searchController.setStore(false);
                     }
                   },
-                  buttonText: 'cancel'.tr,
-                  transparent: true,
-                  width: 80,
+                  icon: const Icon(Icons.arrow_back_ios_new),
                 ),
+
+                Expanded(child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Theme.of(context).disabledColor),
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                  child: SearchFieldWidget(
+                    controller: _searchController,
+                    radius: 50,
+                    filledColor: Theme.of(context).disabledColor.withOpacity(0.1),
+                    hint: Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText!
+                        ? 'search_food_or_restaurant'.tr : 'search_item_or_store'.tr,
+                    suffixIcon: _searchController.text.isNotEmpty ? Icons.clear : null,
+                    prefixIcon: CupertinoIcons.search,
+                    iconPressed: () {
+                      _showSuggestion = false;
+                      searchController.setSearchMode(true);
+                      searchController.setStore(false);
+                    },
+                    onChanged: (text) {
+                      searchController.setSearchText(text);
+                      _searchSuggestions(text);
+                      // _searchController.text = searchController.searchText!;
+                    },
+                    onSubmit: (text) => _actionSearch(true, _searchController.text.trim(), false),
+                  ),
+                )),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
               ]))),
 
-              Expanded(child: searchController.isSearchMode ? SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+              Expanded(child: searchController.isSearchMode ? _showSuggestion ? showSuggestions(
+                context, searchController, _itemsAndStors,
+              ) : SingleChildScrollView(
                 padding: ResponsiveHelper.isDesktop(context) ? EdgeInsets.zero : const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
                 child: FooterView(
                   child: SizedBox(width: Dimensions.webMaxWidth, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                    searchController.historyList.isNotEmpty ? Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      Text(ResponsiveHelper.isDesktop(context) ? 'recent_searches'.tr : 'history'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
-                      InkWell(
-                        onTap: () => searchController.clearSearchHistory(),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: 4),
-                          child: Text('clear_all'.tr, style: robotoRegular.copyWith(
-                            fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor,
-                          )),
+                    searchController.historyList.isNotEmpty ? Padding(
+                      padding: const EdgeInsets.only(top: Dimensions.paddingSizeSmall),
+                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+
+                        Text(ResponsiveHelper.isDesktop(context) ? 'recent_searches'.tr : 'your_last_search'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge)),
+                        InkWell(
+                          onTap: () => searchController.clearSearchHistory(),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: 4),
+                            child: Text('clear_all'.tr, style: robotoRegular.copyWith(
+                              fontSize: Dimensions.fontSizeDefault, color: Colors.red,
+                            )),
+                          ),
                         ),
-                      ),
-                    ]) : const SizedBox(),
+                      ]),
+                    ) : const SizedBox(),
+
                     SizedBox(
                       height: ResponsiveHelper.isDesktop(context) ? 36 : null,
                       child: ListView.builder(
-                        itemCount: searchController.historyList.length,
+                        itemCount: searchController.historyList.length > 10 ? 10 : searchController.historyList.length,
                         physics: const NeverScrollableScrollPhysics(),
                         scrollDirection: ResponsiveHelper.isDesktop(context) ? Axis.horizontal : Axis.vertical,
                         shrinkWrap: true,
@@ -205,10 +264,16 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                                 borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                               ),
                               child: InkWell(
-                                onTap: () => searchController.searchData(searchController.historyList[index], false),
+                                onTap: () {
+                                  _searchController.text = searchController.historyList[index];
+                                  // searchController.setSearchText(searchController.historyList[index]);
+                                  searchController.searchData(searchController.historyList[index], false);
+                                },
                                 child: Row(
                                   children: [
                                     Text(searchController.historyList[index], style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).primaryColor), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    const SizedBox(width: Dimensions.paddingSizeSmall),
+
                                     InkWell(
                                       onTap: () => searchController.removeHistory(index),
                                       child: Padding(
@@ -219,18 +284,19 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                                   ],
                                 ),
                               ),
-                            ): Column(children: [
-                            Row(children: [
+                            ) : InkWell(
+                            onTap: () => searchController.searchData(searchController.historyList[index], false),
+                            child: Row(children: [
+
+                              Icon(CupertinoIcons.search, size: 18, color: Theme.of(context).disabledColor),
+                              const SizedBox(width: Dimensions.paddingSizeSmall),
+
                               Expanded(
-                                child: InkWell(
-                                  onTap: () => searchController.searchData(searchController.historyList[index], false),
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeExtraSmall),
-                                    child: Text(
-                                      searchController.historyList[index],
-                                      style: robotoRegular.copyWith(color: Theme.of(context).disabledColor),
-                                      maxLines: 1, overflow: TextOverflow.ellipsis,
-                                    ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                                  child: Text(
+                                    searchController.historyList[index],
+                                    style: robotoRegular, maxLines: 1, overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ),
@@ -242,8 +308,7 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                                 ),
                               )
                             ]),
-                            index != searchController.historyList.length-1 ? const Divider() : const SizedBox(),
-                          ]);
+                          );
                         },
                       ),
                     ),
@@ -255,22 +320,24 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                     const SizedBox(height: Dimensions.paddingSizeSmall),
                     (_isLoggedIn && searchController.suggestedItemList != null) ? searchController.suggestedItemList!.isNotEmpty ?  GridView.builder(
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: ResponsiveHelper.isMobile(context) ? 2 : 1, childAspectRatio:  ResponsiveHelper.isMobile(context) ? (1/ 0.4) : (1.8/ 0.1),
+                        crossAxisCount: ResponsiveHelper.isMobile(context) ? 2 : 3, childAspectRatio:  ResponsiveHelper.isMobile(context) ? (1/ 0.4) : (1.8/ 0.3),
                         mainAxisSpacing: Dimensions.paddingSizeSmall, crossAxisSpacing: Dimensions.paddingSizeSmall,
                       ),
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemCount: searchController.suggestedItemList!.length,
                       itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {
-                            Get.find<ItemController>().navigateToItemPage(searchController.suggestedItemList![index], context);
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).cardColor,
-                              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-                            ),
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).cardColor,
+                            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                            boxShadow: [BoxShadow(color: Theme.of(context).disabledColor.withOpacity(0.1), blurRadius: 10)]
+                          ),
+                          child: CustomInkWell(
+                            onTap: () {
+                              Get.find<ItemController>().navigateToItemPage(searchController.suggestedItemList![index], context);
+                            },
+                            radius: Dimensions.radiusDefault,
                             child: Row(children: [
                               const SizedBox(width: Dimensions.paddingSizeSmall),
                               ClipRRect(
@@ -291,6 +358,42 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
                         );
                       },
                     ) : Padding(padding: const EdgeInsets.only(top: 10), child: Text('no_suggestions_available'.tr)) : const SizedBox(),
+
+                    SizedBox(height: (_isLoggedIn && searchController.suggestedItemList != null) ? Dimensions.paddingSizeLarge : 0),
+
+                    (searchController.popularCategoryList != null && searchController.popularCategoryList!.isNotEmpty) ? Text(
+                      'popular_categories'.tr, style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
+                    ) : const SizedBox(),
+                    const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                    searchController.popularCategoryList != null ? searchController.popularCategoryList!.isNotEmpty ? Wrap(
+                      children: searchController.popularCategoryList!.map((category) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: Dimensions.paddingSizeSmall, bottom: Dimensions.paddingSizeSmall),
+                          child: CustomInkWell(
+                            onTap: () {
+                              _searchController.text = category.name??'';
+                              searchController.searchData(category.name??'', false);
+                            },
+                            radius: 50,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeSmall),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).disabledColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(50),
+                                border: Border.all(color: Theme.of(context).disabledColor, width: 0.1),
+                              ),
+                              child: Text(
+                                category!.name??'',
+                                style: robotoRegular.copyWith(color: Theme.of(context).textTheme.bodyMedium!.color!),
+                                maxLines: 1, overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ) : Padding(padding: const EdgeInsets.only(top: 10), child: Text('no_category_available'.tr)) : const SizedBox(),
+
                   ])),
                 ),
                 ) : SearchResultWidget(searchText: _searchController.text.trim(), tabController: ResponsiveHelper.isDesktop(context) ? _tabController : null)),
@@ -334,4 +437,41 @@ class SearchScreenState extends State<SearchScreen> with TickerProviderStateMixi
       Get.dialog(FilterWidget(maxValue: maxValue, isStore: Get.find<search.SearchController>().isStore));
     }
   }
+
+
+  Widget showSuggestions(BuildContext context, search.SearchController searchController, List<String> foodsAndRestaurants) {
+    return SingleChildScrollView(
+      child: FooterView(
+        child: SizedBox(
+          width: Dimensions.webMaxWidth,
+          child: foodsAndRestaurants.isNotEmpty ? ListView.builder(
+            itemCount: foodsAndRestaurants.length,
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(foodsAndRestaurants[index]),
+                leading: Icon(CupertinoIcons.search, color: Theme.of(context).disabledColor),
+                trailing: Icon(Icons.north_west, color: Theme.of(context).disabledColor),
+                onTap: () async {
+                  FocusScope.of(context).unfocus();
+                  _searchController.text = foodsAndRestaurants[index];
+                  _actionSearch(true, _searchController.text.trim(), false);
+                },
+              );
+            },
+          ) : Padding(
+            padding: EdgeInsets.only(top: context.height * 0.2),
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const CustomAssetImageWidget(Images.emptyBox, height: 100, width: 100),
+              const SizedBox(height: Dimensions.paddingSizeLarge),
+
+              Text('no_suggestions_found'.tr, style: robotoMedium.copyWith(color: Theme.of(context).hintColor)),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
 }

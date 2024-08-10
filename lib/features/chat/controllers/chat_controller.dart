@@ -84,6 +84,7 @@ class ChatController extends GetxController implements GetxService {
     _hasAdmin = true;
     _searchConversationModel = null;
     ConversationsModel? conversationModel = await chatServiceInterface.getConversationList(offset, type);
+
     if(conversationModel != null) {
       if(offset == 1) {
         _conversationModel = conversationModel;
@@ -116,28 +117,59 @@ class ChatController extends GetxController implements GetxService {
   }
 
   Future<void> searchConversation(String name) async {
-    _searchConversationModel = ConversationsModel();
+    _searchConversationModel = ConversationsModel(
+      conversations: [],
+    );
     update();
+
+    if(name.contains('admin') || name.contains('Admin') || name.contains('a') || name.contains('A')) {
+      _searchConversationModel!.conversations = [];
+      _searchConversationModel!.conversations!.add(Conversation(
+        id: 0, senderId: 0, senderType: UserType.admin.name, receiverId: 0, receiverType: UserType.admin.name,
+        unreadMessageCount: 0, lastMessageId: 0, lastMessageTime: '2024-07-14 11:05:20', createdAt: '2024-07-14T05:05:20.000000Z', updatedAt: '2024-07-14T05:05:20.000000Z',
+        sender: User(
+          id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
+          phone: Get.find<SplashController>().configModel!.phone, email: Get.find<SplashController>().configModel!.email,
+          imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
+        ),
+        receiver: User(
+          id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
+          phone: Get.find<SplashController>().configModel!.phone, email: Get.find<SplashController>().configModel!.email,
+          imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
+        ),
+        lastMessage: Message(
+          id: 0, conversationId: 0, senderId: 0, message: 'Welcome to Sixam Mart',
+          createdAt: '2024-07-14T05:05:20.000000Z', updatedAt: '2024-07-14T05:05:20.000000Z',
+        ),
+      ));
+    }
+
     ConversationsModel? searchConversationModel = await chatServiceInterface.searchConversationList(name);
     if(searchConversationModel != null) {
-      _searchConversationModel = searchConversationModel;
-      int index0 = chatServiceInterface.setIndex(_searchConversationModel!.conversations);
-      bool sender = chatServiceInterface.checkSender(_searchConversationModel!.conversations);
-      if(index0 != -1) {
-        if(sender) {
-          _searchConversationModel!.conversations![index0]!.sender = User(
-            id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
-            phone: Get.find<SplashController>().configModel!.phone, email: Get.find<SplashController>().configModel!.email,
-            imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
-          );
-        }else {
-          _searchConversationModel!.conversations![index0]!.receiver = User(
-            id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
-            phone: Get.find<SplashController>().configModel!.phone, email: Get.find<SplashController>().configModel!.email,
-            imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
-          );
-        }
+      for (var element in searchConversationModel.conversations!) {
+        _searchConversationModel!.conversations!.add(element);
       }
+      // _searchConversationModel = searchConversationModel;
+      // int index0 = chatServiceInterface.setIndex(_searchConversationModel!.conversations);
+      // bool sender = chatServiceInterface.checkSender(_searchConversationModel!.conversations);
+      //
+      // print('searchConversationModel: ${index0}');
+      //
+      // if(index0 != -1) {
+      //   if(sender) {
+      //     _searchConversationModel!.conversations![index0]!.sender = User(
+      //       id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
+      //       phone: Get.find<SplashController>().configModel!.phone, email: Get.find<SplashController>().configModel!.email,
+      //       imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
+      //     );
+      //   }else {
+      //     _searchConversationModel!.conversations![index0]!.receiver = User(
+      //       id: 0, fName: Get.find<SplashController>().configModel!.businessName, lName: '',
+      //       phone: Get.find<SplashController>().configModel!.phone, email: Get.find<SplashController>().configModel!.email,
+      //       imageFullUrl: Get.find<SplashController>().configModel!.logoFullUrl,
+      //     );
+      //   }
+      // }
     }
     update();
   }

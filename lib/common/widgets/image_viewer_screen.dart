@@ -8,7 +8,8 @@ import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
 
 class ImageViewerScreen extends StatelessWidget {
   final Item item;
-  const ImageViewerScreen({super.key, required this.item});
+  final bool isCampaign;
+  const ImageViewerScreen({super.key, required this.item, this.isCampaign = false});
 
   @override
   Widget build(BuildContext context) {

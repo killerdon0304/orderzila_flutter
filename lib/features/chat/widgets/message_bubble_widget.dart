@@ -80,7 +80,7 @@ class MessageBubbleWidget extends StatelessWidget {
                           borderRadius: BorderRadius.circular(Dimensions.paddingSizeSmall),
                           child: CustomImage(
                             height: 100, width: 100, fit: BoxFit.cover,
-                            image: message.fileFullUrl![index],
+                            image: message.fileFullUrl?[index] ?? '',
                           ),
                         ),
                       ),

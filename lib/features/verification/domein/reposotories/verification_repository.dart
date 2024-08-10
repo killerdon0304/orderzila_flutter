@@ -1,7 +1,8 @@
-import 'package:get/get_connect/connect.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/common/models/response_model.dart';
 import 'package:sixam_mart/api/api_client.dart';
+import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/verification/domein/reposotories/verification_repository_interface.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
@@ -13,7 +14,8 @@ class VerificationRepository implements VerificationRepositoryInterface{
 
   @override
   Future<ResponseModel> forgetPassword(String? phone) async {
-    Response response = await apiClient.postData(AppConstants.forgetPasswordUri, {"phone": phone}, handleError: false);
+    String? deviceToken = await Get.find<AuthController>().saveDeviceToken();
+    Response response = await apiClient.postData(AppConstants.forgetPasswordUri, {"phone": phone, "cm_firebase_token": deviceToken!}, handleError: false);
     if (response.statusCode == 200) {
       return ResponseModel(true, response.body["message"]);
     } else {

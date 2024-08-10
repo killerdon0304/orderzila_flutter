@@ -130,7 +130,7 @@ class _ItemThatYouLoveViewState extends State<ItemThatYouLoveView> {
       padding: const EdgeInsets.all(Dimensions.paddingSizeLarge),
       child: Hero(
         tag: "image$index",
-        child: ItemThatYouLoveCard(item: item),
+        child: ItemThatYouLoveCard(item: item, index: index),
       ),
     );
   }

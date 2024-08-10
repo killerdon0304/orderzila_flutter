@@ -161,7 +161,7 @@ class _WebLandingPageState extends State<WebLandingPage> {
                             filled: true, fillColor: Theme.of(context).cardColor,
                             suffixIcon: IconButton(
                               onPressed: () async {
-                                Get.dialog(const CustomLoader(), barrierDismissible: false);
+                                Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
                                 _address = await Get.find<LocationController>().getCurrentLocation(true);
                                 _controller.text = _address!.address ?? '';
                                 Get.back();
@@ -202,7 +202,7 @@ class _WebLandingPageState extends State<WebLandingPage> {
                         buttonText: 'set_location'.tr,
                         onPressed: () async {
                           if(_address != null && _controller.text.trim().isNotEmpty) {
-                            Get.dialog(const CustomLoader(), barrierDismissible: false);
+                            Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
                             ZoneResponseModel response = await Get.find<LocationController>().getZone(
                               _address!.latitude, _address!.longitude, false,
                             );

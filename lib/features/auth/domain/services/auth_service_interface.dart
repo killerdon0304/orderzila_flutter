@@ -13,7 +13,7 @@ abstract class AuthServiceInterface{
   bool isLoggedIn();
   bool isGuestLoggedIn();
   String getSharedPrefGuestId();
-  bool clearSharedData();
+  Future<bool> clearSharedData();
   Future<bool> clearSharedAddress();
   Future<void> saveUserNumberAndPassword(String number, String password, String countryCode);
   String getUserNumber();
@@ -28,6 +28,6 @@ abstract class AuthServiceInterface{
   String getDmTipIndex();
   Future<bool> saveEarningPoint(String point);
   String getEarningPint();
-  void setNotificationActive(bool isActive);
-
+  Future<void> setNotificationActive(bool isActive);
+  Future<String?> saveDeviceToken();
 }

@@ -85,13 +85,13 @@ class ReviewItemCard extends StatelessWidget {
 
                   Text(item!.name!, maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoBold),
 
-                  Row(mainAxisAlignment: isFeatured ? MainAxisAlignment.start : MainAxisAlignment.center, children: [
+                  item!.ratingCount! > 0 ? Row(mainAxisAlignment: isFeatured ? MainAxisAlignment.start : MainAxisAlignment.center, children: [
                     Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
                     const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                     Text(item!.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
                     const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                     Text("(${item!.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                  ]),
+                  ]) : const SizedBox(),
 
                   Wrap(crossAxisAlignment: WrapCrossAlignment.center, alignment: WrapAlignment.start, children: [
                     item!.discount != null && item!.discount! > 0  ? Text(
@@ -169,6 +169,7 @@ class ReviewItemCard extends StatelessWidget {
                     clipBehavior: Clip.none,
                     children: [
                       Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
                         decoration: BoxDecoration(
                           borderRadius: const BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusDefault), topRight: Radius.circular(Dimensions.radiusDefault)),
@@ -186,13 +187,13 @@ class ReviewItemCard extends StatelessWidget {
 
                           Text(item!.name!, maxLines: 1, overflow: TextOverflow.ellipsis, style: robotoBold),
 
-                          Row(mainAxisAlignment: isFeatured ? MainAxisAlignment.start : MainAxisAlignment.center, children: [
+                          item!.ratingCount! > 0 ? Row(mainAxisAlignment: isFeatured ? MainAxisAlignment.start : MainAxisAlignment.center, children: [
                             Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                             Text(item!.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                             Text("(${item!.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                          ]),
+                          ]) : const SizedBox(),
 
                           Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                             discount != null && discount > 0 ? Text(
@@ -220,14 +221,13 @@ class ReviewItemCard extends StatelessWidget {
 
                           Text(item!.name!, style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis),
 
-                          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                          item!.ratingCount! > 0 ? Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                             Icon(Icons.star, size: 15, color: Theme.of(context).primaryColor),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                             Text(item!.avgRating!.toStringAsFixed(1), style: robotoRegular),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                             Text("(${item!.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-                          ],
-                          ),
+                          ]) : const SizedBox(),
 
                           (Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item!.unitType != null) ? Text(
                             '(${item!.unitType ?? ''})',

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/chat/controllers/chat_controller.dart';
 import 'package:sixam_mart/features/chat/enums/user_type_enum.dart';
+import 'package:sixam_mart/features/chat/widgets/chat_serach_field_widget.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -22,7 +23,6 @@ import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/not_logged_in_screen.dart';
 import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
 import 'package:sixam_mart/features/chat/widgets/web_chat_view_widget.dart';
-import 'package:sixam_mart/features/search/widgets/search_field_widget.dart';
 
 class ConversationScreen extends StatefulWidget {
   final bool fromNavBar;
@@ -89,9 +89,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
           child: Column(children: [
 
             (AuthHelper.isLoggedIn() && conversation != null && conversation.conversations != null
-            && chatController.conversationModel!.conversations!.isNotEmpty) ? Center(child: SizedBox(width: Dimensions.webMaxWidth, child: SearchFieldWidget(
+            && chatController.conversationModel!.conversations!.isNotEmpty) ? Center(child: SizedBox(width: Dimensions.webMaxWidth, child: ChatSearchFieldWidget(
               controller: _searchController,
-              hint: 'search'.tr,
+              hint: '${'search'.tr}...',
               suffixIcon: chatController.searchConversationModel != null ? Icons.close : Icons.search,
               onSubmit: (String text) {
                 if(_searchController.text.trim().isNotEmpty) {

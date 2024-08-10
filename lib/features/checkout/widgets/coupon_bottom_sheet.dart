@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/features/coupon/controllers/coupon_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/coupon/domain/models/coupon_model.dart';
@@ -8,9 +9,11 @@ import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/features/coupon/widgets/coupon_card_widget.dart';
+
 class CouponBottomSheet extends StatelessWidget {
   final int? storeId;
-  const CouponBottomSheet({super.key, required this.storeId});
+  final CheckoutController checkoutController;
+  const CouponBottomSheet({super.key, required this.storeId, required this.checkoutController});
 
   @override
   Widget build(BuildContext context) {
@@ -63,7 +66,10 @@ class CouponBottomSheet extends StatelessWidget {
               itemBuilder: (context, index) {
                 return InkWell(
                   onTap: () {
-                    Get.back(result: couponList![index].code);
+                    if(couponList![index].code != null) {
+                      checkoutController.couponController.text = couponList[index].code.toString();
+                    }
+                    Get.back();
                   },
                   child: CouponCardWidget(coupon: couponList![index], index: index),
                 );

@@ -23,7 +23,7 @@ class SlotWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
             boxShadow: [ BoxShadow(color: Colors.grey[Get.isDarkMode ? 800 : 200]!, spreadRadius: 0.5, blurRadius: 0.5)],),
           child: Text(
-            title, maxLines: 1, overflow: TextOverflow.ellipsis,
+            title, maxLines: 2, overflow: TextOverflow.ellipsis,
             style: robotoRegular.copyWith(
               color: isSelected ? Theme.of(context).cardColor : Theme.of(context).textTheme.bodyLarge!.color,
               fontSize: Dimensions.fontSizeExtraSmall,

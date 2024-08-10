@@ -97,7 +97,7 @@ class AddressBottomSheetWidget extends StatelessWidget {
                     child: TextButton.icon(
                       onPressed: (){
                         Get.find<LocationController>().checkPermission(() async {
-                          Get.dialog(const CustomLoader(), barrierDismissible: false);
+                          Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
                           AddressModel address = await Get.find<LocationController>().getCurrentLocation(true);
                           ZoneResponseModel response = await Get.find<LocationController>().getZone(address.latitude, address.longitude, false);
                           if(response.isSuccess) {
@@ -160,7 +160,7 @@ class AddressBottomSheetWidget extends StatelessWidget {
                           address: addressController.addressList![index],
                           fromAddress: false, isSelected: selected, fromDashBoard: true,
                           onTap: () {
-                            Get.dialog(const CustomLoader(), barrierDismissible: false);
+                            Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
                             AddressModel address = addressController.addressList![index];
                             Get.find<LocationController>().saveAddressAndNavigate(
                               address, false, null, false, ResponsiveHelper.isDesktop(context),

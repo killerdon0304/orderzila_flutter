@@ -1,5 +1,7 @@
+import 'package:sixam_mart/common/widgets/custom_tool_tip_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
+import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +14,11 @@ class DeliveryOptionButtonWidget extends StatefulWidget {
   final bool? isFree;
   final bool fromWeb;
   final double total;
+  final String deliveryChargeForView;
+  final double badWeatherCharge;
+  final double extraChargeForToolTip;
   const DeliveryOptionButtonWidget({super.key, required this.value, required this.title, required this.charge, required this.isFree,
-    this.fromWeb = false, required this.total});
+    this.fromWeb = false, required this.total, required this.deliveryChargeForView, required this.badWeatherCharge, required this.extraChargeForToolTip});
 
   @override
   State<DeliveryOptionButtonWidget> createState() => _DeliveryOptionButtonWidgetState();
@@ -59,10 +64,9 @@ class _DeliveryOptionButtonWidgetState extends State<DeliveryOptionButtonWidget>
           },
           child: Container(
             decoration: BoxDecoration(
-              color: select  ? widget.fromWeb ? Theme.of(context).primaryColor.withOpacity(0.05) : Theme.of(context).cardColor : Colors.transparent,
+              color: select  ? widget.fromWeb ? Theme.of(context).primaryColor.withOpacity(0.1) : Theme.of(context).cardColor : Colors.transparent,
               borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
               border: Border.all(color: select ? Theme.of(context).primaryColor : Colors.transparent),
-              boxShadow: [BoxShadow(color: select ? Theme.of(context).primaryColor.withOpacity(0.1) : Colors.transparent, blurRadius: 10)]
             ),
             padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall, vertical: Dimensions.paddingSizeExtraSmall),
             child: Row(
@@ -79,8 +83,22 @@ class _DeliveryOptionButtonWidgetState extends State<DeliveryOptionButtonWidget>
                 ),
                 const SizedBox(width: Dimensions.paddingSizeSmall),
 
-                Text(widget.title, style: robotoMedium.copyWith(color: select ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color)),
-                const SizedBox(width: 5),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(widget.title, style: robotoMedium.copyWith(color: select ? Theme.of(context).primaryColor : Theme.of(context).textTheme.bodyMedium!.color)),
+
+                  Row(children: [
+                    Text(widget.value == 'delivery' ? '${'charge'.tr}: +${widget.deliveryChargeForView}' : 'free'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyMedium!.color)),
+                    const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                    widget.deliveryChargeForView != PriceConverter.convertPrice(0) && widget.value == 'delivery' && checkoutController.extraCharge != null && (widget.deliveryChargeForView != '0') && widget.extraChargeForToolTip > 0 ? CustomToolTip(
+                      message: '${'this_charge_include_extra_vehicle_charge'.tr} ${PriceConverter.convertPrice(widget.extraChargeForToolTip)} ${widget.badWeatherCharge > 0 ? '${'and_bad_weather_charge'.tr} ${PriceConverter.convertPrice(widget.badWeatherCharge)}' : ''}',
+                      preferredDirection: AxisDirection.right,
+                      child: const Icon(Icons.info, color: Colors.blue, size: 14),
+                    ) : const SizedBox(),
+                  ]),
+
+                ]),
+                const SizedBox(width: Dimensions.paddingSizeSmall),
 
               ],
             ),

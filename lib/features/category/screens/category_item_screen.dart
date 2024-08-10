@@ -125,7 +125,7 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
             ) : Text(widget.categoryName, style: robotoRegular.copyWith(
               fontSize: Dimensions.fontSizeLarge, color: Theme.of(context).textTheme.bodyLarge!.color,
             )),
-            centerTitle: true,
+            centerTitle: false,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back_ios),
               color: Theme.of(context).textTheme.bodyLarge!.color,
@@ -172,6 +172,8 @@ class CategoryItemScreenState extends State<CategoryItemScreen> with TickerProvi
                   }
                 }
               }),
+
+              const SizedBox(width: Dimensions.paddingSizeSmall),
             ],
           )),
           endDrawer: const MenuDrawer(),endDrawerEnableOpenDragGesture: false,

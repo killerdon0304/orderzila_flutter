@@ -52,7 +52,7 @@ class LoyaltyHistoryWidget extends StatelessWidget {
             child: CircularProgressIndicator(),
           )) : const SizedBox(),
 
-
+          const SizedBox(height: 50),
         ]);
       }
     );

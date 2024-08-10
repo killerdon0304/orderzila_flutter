@@ -16,14 +16,14 @@ class StoreSortingButton extends StatelessWidget {
       return Container(
         padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeExtraSmall, vertical: Dimensions.paddingSizeExtraSmall),
         decoration: BoxDecoration(
-          color: storeController.storeType == storeType ? Theme.of(context).primaryColor.withOpacity(0.1) : Theme.of(context).cardColor,
+          color: storeController.filterType == storeType ? Theme.of(context).primaryColor.withOpacity(0.1) : Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-          border: Border.all(color: storeController.storeType == storeType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
+          border: Border.all(color: storeController.filterType == storeType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor),
         ),
         child: Row(children: [
-          Icon(storeController.storeType == storeType ? Icons.check_circle : Icons.circle_outlined, color: storeController.storeType == storeType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor, size: 16),
+          Icon(storeController.filterType == storeType ? Icons.check_circle : Icons.circle_outlined, color: storeController.filterType == storeType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor, size: 16),
           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-          Text(storeTypeText, style: robotoMedium.copyWith(color: storeController.storeType == storeType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor)),
+          Text(storeTypeText, style: robotoMedium.copyWith(color: storeController.filterType == storeType ? Theme.of(context).primaryColor : Theme.of(context).disabledColor)),
         ]),
       );
     }

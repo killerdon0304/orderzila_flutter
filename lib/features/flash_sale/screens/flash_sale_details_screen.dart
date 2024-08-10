@@ -95,7 +95,7 @@ class _FlashSaleDetailsScreenState extends State<FlashSaleDetailsScreen> {
                                 vertical: Dimensions.paddingSizeDefault,
                             ),
                             itemBuilder: (context, index) {
-                              return FlashProductCardWidget(product: flashSaleController.productFlashSale!.products![index]);
+                              return FlashProductCardWidget(product: flashSaleController.productFlashSale!.products![index], index: index);
                             },
                           ) : const FlashProductCardShimmer(),
                         ),

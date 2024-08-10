@@ -49,6 +49,8 @@ class ParcelRequestScreen extends StatefulWidget {
 
 class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
   final TextEditingController _tipController = TextEditingController();
+  final TextEditingController _guestEmailController = TextEditingController();
+  final FocusNode _guestEmailNode = FocusNode();
   bool _isLoggedIn = AuthHelper.isLoggedIn();
   bool? _isCashOnDeliveryActive = false;
   bool? _isDigitalPaymentActive = false;
@@ -263,6 +265,29 @@ class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
                   ),
                 ),
                 const SizedBox(height: Dimensions.paddingSizeDefault),
+
+                AuthHelper.isGuestLoggedIn() ? CardWidget(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('guest_email'.tr, style: robotoMedium),
+                        const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                        CustomTextField(
+                          titleText: 'enter_email'.tr,
+                          labelText: 'email'.tr,
+                          controller: _guestEmailController,
+                          inputType: TextInputType.emailAddress,
+                          focusNode: _guestEmailNode,
+                          inputAction: TextInputAction.done,
+                        ),
+                      ],
+                    ),
+                  ),
+                ) : const SizedBox(),
+                const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
                 (Get.find<SplashController>().configModel!.dmTipsStatus == 1) ? Container(
                   color: Theme.of(context).cardColor,
@@ -570,6 +595,8 @@ class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
           showCustomSnackBar('tips_can_not_be_negative'.tr);
         }else if(parcelController.paymentIndex == -1) {
           showCustomSnackBar('please_select_payment_method_first'.tr);
+        }else if(AuthHelper.isGuestLoggedIn() && _guestEmailController.text.isEmpty) {
+          showCustomSnackBar('please_enter_your_email'.tr);
         }else {
 
           PlaceOrderBodyModel placeOrderBody = PlaceOrderBodyModel(
@@ -589,7 +616,9 @@ class _ParcelRequestScreenState extends State<ParcelRequestScreen> {
             chargePayer: parcelController.payerTypes[parcelController.payerIndex], dmTips: parcelController.tips.toString(),
             cutlery: 0, unavailableItemNote: '',
             deliveryInstruction: (isInstructionSelected ? '${parcelController.parcelInstructionList![parcelController.selectedIndexNote!].instruction}' : '') + (isInstructionSelected ? (isCustomNote ? " (${parcelController.customNote})" : '') : (isCustomNote ? parcelController.customNote ?? '' : '')),
-            partialPayment: 0, guestId: AuthHelper.isGuestLoggedIn() ? int.parse(AuthHelper.getGuestId()) : 0, isBuyNow: 0, guestEmail: null, extraPackagingAmount: null,
+            partialPayment: 0, guestId: AuthHelper.isGuestLoggedIn() ? int.parse(AuthHelper.getGuestId()) : 0, isBuyNow: 0,
+            guestEmail: _guestEmailController.text.trim(), extraPackagingAmount: null,
+            createNewUser: 0, password: null,
           );
 
           if(parcelController.paymentIndex == 3) {

@@ -144,7 +144,14 @@ class Item {
     name = json['name'];
     description = json['description'];
     imageFullUrl = json['image_full_url'];
-    imagesFullUrl = json['images_full_url'] != null ? json['images_full_url'].cast<String>() : [];
+    if(json['images_full_url'] != null){
+      imagesFullUrl = [];
+      json['images_full_url'].forEach((v) {
+        if(v != null) {
+          imagesFullUrl!.add(v.toString());
+        }
+      });
+    }
     categoryId = json['category_id'];
     if (json['category_ids'] != null) {
       categoryIds = [];

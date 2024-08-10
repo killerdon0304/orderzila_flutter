@@ -24,7 +24,7 @@ class ItemsView extends StatefulWidget {
   final bool isFeatured;
   final bool? isFoodOrGrocery;
   const ItemsView({super.key, required this.stores, required this.items, required this.isStore, this.isScrollable = false,
-    this.shimmerLength = 20, this.padding = const EdgeInsets.all(Dimensions.paddingSizeSmall), this.noDataText,
+    this.shimmerLength = 20, this.padding = const EdgeInsets.all(Dimensions.paddingSizeDefault), this.noDataText,
     this.isCampaign = false, this.inStorePage = false, this.isFeatured = false,
     this.isFoodOrGrocery = true});
 

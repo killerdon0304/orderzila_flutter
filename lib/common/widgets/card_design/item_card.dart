@@ -23,7 +23,8 @@ class ItemCard extends StatelessWidget {
   final bool isFood;
   final bool isShop;
   final bool isPopularItemCart;
-  const ItemCard({super.key, required this.item, this.isPopularItem = false, required this.isFood, required this.isShop, this.isPopularItemCart = false});
+  final int? index;
+  const ItemCard({super.key, required this.item, this.isPopularItem = false, required this.isFood, required this.isShop, this.isPopularItemCart = false, this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -103,6 +104,7 @@ class ItemCard extends StatelessWidget {
                     bottom: 10, right: 20,
                     child: CartCountView(
                       item: item,
+                      index: index,
                     ),
                   ),
 
@@ -117,65 +119,70 @@ class ItemCard extends StatelessWidget {
                   padding: EdgeInsets.only(left: Dimensions.paddingSizeSmall, right: isShop ? 0 : Dimensions.paddingSizeSmall, top: Dimensions.paddingSizeSmall, bottom: isShop ? 0 : Dimensions.paddingSizeSmall),
                   child: Stack(clipBehavior: Clip.none, children: [
 
-                    Column(
-                      crossAxisAlignment: isPopularItem ? CrossAxisAlignment.center : CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      (isFood || isShop) ? Text(item.storeName ?? '', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))
-                          : Text(item.name ?? '', style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Align(
+                      alignment: isPopularItem ? Alignment.center : Alignment.centerLeft,
+                      child: Column(
+                        crossAxisAlignment: isPopularItem ? CrossAxisAlignment.center : CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
+                        (isFood || isShop) ? Text(item.storeName ?? '', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor))
+                            : Text(item.name ?? '', style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis),
 
-                      (isFood || isShop) ? Flexible(
-                        child: Text(
-                          item.name ?? '',
-                          style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis,
+                        (isFood || isShop) ? Flexible(
+                          child: Text(
+                            item.name ?? '',
+                            style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis,
+                          ),
+                        ) : item.ratingCount! > 0 ? Row(mainAxisAlignment: isPopularItem ? MainAxisAlignment.center : MainAxisAlignment.start, children: [
+                          Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
+                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                          Text(item.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                          Text("(${item.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+                        ]) : const SizedBox(),
+
+                        // showUnitOrRattings(context);
+                        (isFood || isShop) ? item.ratingCount! > 0 ? Row(mainAxisAlignment: isPopularItem ? MainAxisAlignment.center : MainAxisAlignment.start, children: [
+                          Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
+                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                          Text(item.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+                          const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+
+                          Text("(${item.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+
+                        ]) : const SizedBox() : (Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item.unitType != null) ? Text(
+                          '(${ item.unitType ?? ''})',
+                          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor),
+                        ) : const SizedBox(),
+
+                        discount != null && discount > 0  ? Text(
+                          PriceConverter.convertPrice(Get.find<ItemController>().getStartingPrice(item)),
+                          style: robotoMedium.copyWith(
+                            fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor,
+                            decoration: TextDecoration.lineThrough,
+                          ), textDirection: TextDirection.ltr,
+                        ) : const SizedBox(),
+                        // SizedBox(height: item.discount != null && item.discount! > 0 ? Dimensions.paddingSizeExtraSmall : 0),
+
+                        Text(
+                          PriceConverter.convertPrice(
+                            Get.find<ItemController>().getStartingPrice(item), discount: discount,
+                            discountType: discountType,
+                          ),
+                          textDirection: TextDirection.ltr, style: robotoMedium,
                         ),
-                      ) : Row(mainAxisAlignment: isPopularItem ? MainAxisAlignment.center : MainAxisAlignment.start, children: [
-                        Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
-                        const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                        Text(item.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                        const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+                        const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                        Text("(${item.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
                       ]),
-
-                      (isFood || isShop) ? Row(mainAxisAlignment: isPopularItem ? MainAxisAlignment.center : MainAxisAlignment.start, children: [
-                        Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
-                        const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-
-                        Text(item.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
-                        const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-
-                        Text("(${item.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
-
-                      ]) : (Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item.unitType != null) ? Text(
-                        '(${ item.unitType ?? ''})',
-                        style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor),
-                      ) : const SizedBox(),
-
-                      discount != null && discount > 0  ? Text(
-                        PriceConverter.convertPrice(Get.find<ItemController>().getStartingPrice(item)),
-                        style: robotoMedium.copyWith(
-                          fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).disabledColor,
-                          decoration: TextDecoration.lineThrough,
-                        ), textDirection: TextDirection.ltr,
-                      ) : const SizedBox(),
-                      // SizedBox(height: item.discount != null && item.discount! > 0 ? Dimensions.paddingSizeExtraSmall : 0),
-
-                      Text(
-                        PriceConverter.convertPrice(
-                          Get.find<ItemController>().getStartingPrice(item), discount: discount,
-                          discountType: discountType,
-                        ),
-                        textDirection: TextDirection.ltr, style: robotoMedium,
-                      ),
-
-                      const SizedBox(height: Dimensions.paddingSizeExtraSmall),
-
-                    ]),
+                    ),
 
                     isShop ? Positioned(
                       bottom: 0, right: 0,
                       child: CartCountView(
                         item: item,
+                        index: index,
                         child: Container(
                           height: 35, width: 38,
                           decoration: BoxDecoration(
@@ -198,4 +205,27 @@ class ItemCard extends StatelessWidget {
       ]),
     );
   }
+
+  // Widget? showUnitOrRattings(BuildContext context) {
+  //   if(isFood || isShop) {
+  //     if(item.ratingCount! > 0) {
+  //       return Row(mainAxisAlignment: isPopularItem ? MainAxisAlignment.center : MainAxisAlignment.start, children: [
+  //         Icon(Icons.star, size: 14, color: Theme.of(context).primaryColor),
+  //         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+  //
+  //         Text(item.avgRating!.toStringAsFixed(1), style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+  //         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+  //
+  //         Text("(${item.ratingCount})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
+  //
+  //       ]);
+  //     }
+  //   } else if(Get.find<SplashController>().configModel!.moduleConfig!.module!.unit! && item.unitType != null) {
+  //     return Text(
+  //       '(${ item.unitType ?? ''})',
+  //       style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeExtraSmall, color: Theme.of(context).hintColor),
+  //     );
+  //   }
+  // }
+
 }

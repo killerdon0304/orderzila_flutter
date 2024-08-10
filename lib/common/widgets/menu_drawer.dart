@@ -31,7 +31,7 @@ class MenuDrawerState extends State<MenuDrawer> with SingleTickerProviderStateMi
     }),
     Menu(icon: Images.orders, title: 'my_orders'.tr, onTap: () {
       Get.back();
-      Get.toNamed(RouteHelper.getOrderRoute());
+      Get.offAllNamed(RouteHelper.getOrderRoute());
     }),
     Menu(icon: Images.location, title: 'my_address'.tr, onTap: () {
       Get.back();

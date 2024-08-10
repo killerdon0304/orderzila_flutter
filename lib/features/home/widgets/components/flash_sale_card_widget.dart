@@ -137,6 +137,7 @@ class _FlashSaleCardState extends State<FlashSaleCard> {
                           ),
                         ) : CartCountView(
                           item: activeProduct.item!,
+                          index: index,
                           child: Center(
                             child: Container(
                               alignment: Alignment.center,
@@ -165,6 +166,7 @@ class _FlashSaleCardState extends State<FlashSaleCard> {
                           ),
                         ) : CartCountView(
                           item: activeProduct.item!,
+                          index: index,
                           child: Center(
                             child: Container(
                               alignment: Alignment.center,

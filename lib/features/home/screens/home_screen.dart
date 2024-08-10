@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/rendering.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
 import 'package:sixam_mart/features/brands/controllers/brands_controller.dart';
+import 'package:sixam_mart/features/home/controllers/advertisement_controller.dart';
 import 'package:sixam_mart/features/home/controllers/home_controller.dart';
+import 'package:sixam_mart/features/home/widgets/all_store_filter_widget.dart';
 import 'package:sixam_mart/features/home/widgets/cashback_logo_widget.dart';
 import 'package:sixam_mart/features/home/widgets/cashback_dialog_widget.dart';
 import 'package:sixam_mart/features/home/widgets/refer_bottom_sheet_widget.dart';
@@ -36,7 +39,6 @@ import 'package:sixam_mart/common/widgets/menu_drawer.dart';
 import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
 import 'package:sixam_mart/common/widgets/web_menu_bar.dart';
 import 'package:sixam_mart/features/home/screens/web_new_home_screen.dart';
-import 'package:sixam_mart/features/home/widgets/filter_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/home/widgets/module_view.dart';
@@ -71,6 +73,7 @@ class HomeScreen extends StatefulWidget {
       Get.find<ItemController>().getRecommendedItemList(reload, 'all', false);
       Get.find<StoreController>().getStoreList(1, reload);
       Get.find<StoreController>().getRecommendedStoreList();
+      Get.find<AdvertisementController>().getAdvertisementList();
     }
     if(AuthHelper.isLoggedIn()) {
       Get.find<StoreController>().getVisitAgainStoreList(fromModule: fromModule);
@@ -105,6 +108,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  bool searchBgShow = false;
+  final GlobalKey _headerKey = GlobalKey();
 
   @override
   void initState() {
@@ -206,6 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   await Get.find<StoreController>().getLatestStoreList(true, 'all', false);
                   await Get.find<ItemController>().getReviewedItemList(true, 'all', false);
                   await Get.find<StoreController>().getStoreList(1, true);
+                  Get.find<AdvertisementController>().getAdvertisementList();
                   if (AuthHelper.isLoggedIn()) {
                     await Get.find<ProfileController>().getUserInfo();
                     await Get.find<NotificationController>().getNotificationList(true);
@@ -248,7 +254,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       width: Dimensions.webMaxWidth, height: Get.find<LocalizationController>().isLtr ? 60 : 70, color: Theme.of(context).colorScheme.surface,
                       child: Row(children: [
                         (splashController.module != null && splashController.configModel!.module == null) ? InkWell(
-                          onTap: () => splashController.removeModule(),
+                          onTap: () {
+                            splashController.removeModule();
+                            Get.find<StoreController>().resetStoreData();
+                          },
                           child: Image.asset(Images.moduleIcon, height: 25, width: 25, color: Theme.of(context).textTheme.bodyLarge!.color),
                         ) : const SizedBox(),
                         SizedBox(width: (splashController.module != null && splashController.configModel!.module == null) ? Dimensions.paddingSizeSmall : 0),
@@ -263,7 +272,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: GetBuilder<LocationController>(builder: (locationController) {
                               return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                 Text(
-                                  AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr,
+                                  AuthHelper.isLoggedIn() ? AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr : 'your_location'.tr,
                                   style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeDefault),
                                   maxLines: 1, overflow: TextOverflow.ellipsis,
                                 ),
@@ -307,9 +316,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   /// Search Button
                   !showMobileModule ? SliverPersistentHeader(
                     pinned: true,
-                    delegate: SliverDelegate(child: Center(child: Container(
+                    delegate: SliverDelegate(callback: (val){}, child: Center(child: Container(
                       height: 50, width: Dimensions.webMaxWidth,
-                      // color: Theme.of(context).colorScheme.background,
+                      color: searchBgShow ? Get.find<ThemeController>().darkTheme ? Theme.of(context).colorScheme.surface : Theme.of(context).cardColor : null,
                       padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
                       child: InkWell(
                         onTap: () => Get.toNamed(RouteHelper.getSearchRoute()),
@@ -351,49 +360,44 @@ class _HomeScreenState extends State<HomeScreen> {
                             : isShop ? const ShopHomeScreen()
                             : const SizedBox(),
 
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(Get.find<LocalizationController>().isLtr ? 10 : 0, 15, 0, 5),
-                          child: GetBuilder<StoreController>(
-                              builder: (storeController) {
-                                return Row(children: [
-                                  Expanded(child: Padding(
-                                    padding: EdgeInsets.only(right: Get.find<LocalizationController>().isLtr ? 0 : 10),
-                                    child: Text(
-                                      '${storeController.storeModel?.totalSize ?? 0} ${Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'restaurants'.tr : 'stores'.tr}',
-                                      style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
-                                    ),
-                                  )),
-
-                                  FilterView(storeController: storeController),
-                                ]);
-                              }
-                          ),
-                        ),
-
-                        GetBuilder<StoreController>(builder: (storeController) {
-                          return PaginatedListView(
-                            scrollController: _scrollController,
-                            totalSize: storeController.storeModel?.totalSize,
-                            offset: storeController.storeModel?.offset,
-                            onPaginate: (int? offset) async => await storeController.getStoreList(offset!, false),
-                            itemView: ItemsView(
-                              isStore: true,
-                              items: null,
-                              isFoodOrGrocery: (isFood || isGrocery),
-                              stores: storeController.storeModel?.stores,
-                              padding: EdgeInsets.symmetric(
-                                horizontal: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall,
-                                vertical: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeDefault,
-                              ),
-                            ),
-                          );
-                        }),
-
-                        SizedBox(height: ResponsiveHelper.isDesktop(context) ? 0 : 100),
-
                       ]) : ModuleView(splashController: splashController),
                     )),
                   ),
+
+                  !showMobileModule ? SliverPersistentHeader(
+                    key: _headerKey,
+                    pinned: true,
+                    delegate: SliverDelegate(
+                      height: 85,
+                      callback: (val) {
+                        searchBgShow = val;
+                      },
+                      child: const AllStoreFilterWidget(),
+                    ),
+                  ) : const SliverToBoxAdapter(),
+
+                  SliverToBoxAdapter(child: !showMobileModule ? Center(child: GetBuilder<StoreController>(builder: (storeController) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: ResponsiveHelper.isDesktop(context) ? 0 : 100),
+                      child: PaginatedListView(
+                        scrollController: _scrollController,
+                        totalSize: storeController.storeModel?.totalSize,
+                        offset: storeController.storeModel?.offset,
+                        onPaginate: (int? offset) async => await storeController.getStoreList(offset!, false),
+                        itemView: ItemsView(
+                          isStore: true,
+                          items: null,
+                          isFoodOrGrocery: (isFood || isGrocery),
+                          stores: storeController.storeModel?.stores,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall,
+                            vertical: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeDefault,
+                          ),
+                        ),
+                      ),
+                    );
+                  }),) : const SizedBox()),
+
                 ],
               ),
             ),
@@ -416,22 +420,27 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class SliverDelegate extends SliverPersistentHeaderDelegate {
   Widget child;
+  double height;
+  Function(bool isPinned)? callback;
+  bool isPinned = false;
 
-  SliverDelegate({required this.child});
+  SliverDelegate({required this.child, this.height = 50, this.callback});
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+    isPinned = shrinkOffset == maxExtent /*|| shrinkOffset < maxExtent*/;
+    callback!(isPinned);
     return child;
   }
 
   @override
-  double get maxExtent => 50;
+  double get maxExtent => height;
 
   @override
-  double get minExtent => 50;
+  double get minExtent => height;
 
   @override
   bool shouldRebuild(SliverDelegate oldDelegate) {
-    return oldDelegate.maxExtent != 50 || oldDelegate.minExtent != 50 || child != oldDelegate.child;
+    return oldDelegate.maxExtent != height || oldDelegate.minExtent != height || child != oldDelegate.child;
   }
 }

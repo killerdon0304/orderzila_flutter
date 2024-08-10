@@ -2,6 +2,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
@@ -69,6 +70,20 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   void initState() {
     super.initState();
     initCall();
+
+    if(widget.address != null) {
+      splitPhoneNumber(widget.address!.contactPersonNumber!);
+      _contactPersonNameController.text = widget.address!.contactPersonName ?? '';
+      _emailController.text = widget.address!.email ?? '';
+      _streetNumberController.text = widget.address!.streetNumber ?? '';
+      _houseController.text = widget.address!.house ?? '';
+      _floorController.text = widget.address!.floor ?? '';
+
+    }else if(Get.find<ProfileController>().userInfoModel != null && _contactPersonNameController.text.isEmpty) {
+      _contactPersonNameController.text = '${Get.find<ProfileController>().userInfoModel!.fName} ${Get.find<ProfileController>().userInfoModel!.lName}';
+      splitPhoneNumber(Get.find<ProfileController>().userInfoModel!.phone!);
+    }
+
   }
 
   void initCall(){
@@ -118,19 +133,6 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       appBar: CustomAppBar(title: widget.forGuest ? 'set_address'.tr : widget.address == null ? 'add_new_address'.tr : 'update_address'.tr),
       body: SafeArea(
         child: GetBuilder<ProfileController>(builder: (profileController) {
-          if(widget.address != null) {
-            splitPhoneNumber(widget.address!.contactPersonNumber!);
-              _contactPersonNameController.text = widget.address!.contactPersonName ?? '';
-              _emailController.text = widget.address!.email ?? '';
-              _streetNumberController.text = widget.address!.streetNumber ?? '';
-              _houseController.text = widget.address!.house ?? '';
-              _floorController.text = widget.address!.floor ?? '';
-
-          }else if(profileController.userInfoModel != null && _contactPersonNameController.text.isEmpty) {
-            _contactPersonNameController.text = '${profileController.userInfoModel!.fName} ${profileController.userInfoModel!.lName}';
-            splitPhoneNumber(profileController.userInfoModel!.phone!);
-          }
-
           return GetBuilder<LocationController>(builder: (locationController) {
             _addressController.text = locationController.address!;
 
@@ -203,6 +205,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                                 locationController.getCurrentLocation(true, mapController: controller);
                                               }
                                             },
+                                            style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
                                             gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
                                               Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
                                               Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
@@ -317,7 +320,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                       height: 90, width: 680,
                                       child: CustomTextField(
                                         titleText: '${'level_name'.tr}(${'optional'.tr})',
-                                        hintText: '',
+                                        hintText: 'write_level_name'.tr,
                                         showTitle: true,
                                         inputType: TextInputType.text,
                                         controller: _levelController,
@@ -333,6 +336,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         suffixIcon: Icons.my_location,
                                         showTitle: true,
                                         titleText: 'delivery_address'.tr,
+                                        hintText: 'write_delivery_address'.tr,
                                         inputType: TextInputType.streetAddress,
                                         controller: _addressController,
                                         focusNode: _addressNode,
@@ -360,7 +364,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         CustomTextField(
                                           showTitle: true,
                                           titleText: 'contact_person_name'.tr,
-                                          hintText: ' ',
+                                          hintText: 'write_name'.tr,
+                                          showLabelText: false,
                                           inputType: TextInputType.name,
                                           controller: _contactPersonNameController,
                                           focusNode: _nameNode,
@@ -372,7 +377,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         CustomTextField(
                                           showTitle: true,
                                           titleText: 'contact_person_number'.tr,
-                                          hintText: ' ',
+                                          hintText: 'write_number'.tr,
+                                          showLabelText: false,
                                           controller: _contactPersonNumberController,
                                           focusNode: _numberNode,
                                           nextFocus: widget.forGuest ? _emailFocus :_streetNode,
@@ -388,7 +394,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                         widget.forGuest ? CustomTextField(
                                           showTitle: true,
                                           titleText: 'email'.tr,
-                                          hintText: ' ',
+                                          hintText: 'email'.tr,
+                                          showLabelText: false,
                                           controller: _emailController,
                                           focusNode: _emailFocus,
                                           nextFocus: _streetNode,
@@ -398,8 +405,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
                                         CustomTextField(
                                           showTitle: true,
-                                          hintText: ' ',
+                                          hintText: 'write_street_number'.tr,
                                           titleText: '${'street_number'.tr} (${'optional'.tr})',
+                                          showLabelText: false,
                                           inputType: TextInputType.streetAddress,
                                           focusNode: _streetNode,
                                           nextFocus: _houseNode,
@@ -411,8 +419,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                                           Expanded(
                                             child: CustomTextField(
                                               showTitle: true,
-                                              hintText: ' ',
+                                              hintText: 'write_house_number'.tr,
                                               titleText: '${'house'.tr} (${'optional'.tr})',
+                                              showLabelText: false,
                                               inputType: TextInputType.text,
                                               focusNode: _houseNode,
                                               nextFocus: _floorNode,
@@ -423,7 +432,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
                                           Expanded(
                                             child: CustomTextField(
-                                              hintText: ' ',
+                                              hintText: 'write_floor_number'.tr,
+                                              showLabelText: false,
                                               showTitle: true,
                                               titleText: "${'floor'.tr} (${'optional'.tr})",
                                               inputType: TextInputType.text,
@@ -507,6 +517,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                               locationController.getCurrentLocation(true, mapController: controller);
                             }
                           },
+                          style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
                           gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
                             Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
                             Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),

@@ -23,8 +23,9 @@ class PaymentWebViewScreen extends StatefulWidget {
   final String contactNumber;
   final String? subscriptionUrl;
   final int? storeId;
+  final bool? createAccount;
   const PaymentWebViewScreen({super.key, required this.orderModel, required this.isCashOnDelivery, this.addFundUrl, required this.paymentMethod,
-    required this.guestId, required this.contactNumber, this.subscriptionUrl, this.storeId});
+    required this.guestId, required this.contactNumber, this.subscriptionUrl, this.storeId, this.createAccount = false});
 
   @override
   PaymentScreenState createState() => PaymentScreenState();
@@ -108,7 +109,8 @@ class PaymentScreenState extends State<PaymentWebViewScreen> {
                 Get.find<OrderController>().paymentRedirect(
                   url: url.toString(), canRedirect: _canRedirect, onClose: (){} ,
                   addFundUrl: widget.addFundUrl, orderID: widget.orderModel.id.toString(), contactNumber: widget.contactNumber,
-                  subscriptionUrl: widget.subscriptionUrl, storeId: widget.storeId,
+                  subscriptionUrl: widget.subscriptionUrl, storeId: widget.storeId, createAccount: widget.createAccount!,
+                  guestId: widget.guestId,
                 );
                 setState(() {
                   _isLoading = true;
@@ -132,7 +134,8 @@ class PaymentScreenState extends State<PaymentWebViewScreen> {
                 Get.find<OrderController>().paymentRedirect(
                   url: url.toString(), canRedirect: _canRedirect, onClose: (){} ,
                   addFundUrl: widget.addFundUrl, orderID: widget.orderModel.id.toString(), contactNumber: widget.contactNumber,
-                  subscriptionUrl: widget.subscriptionUrl, storeId: widget.storeId,
+                  subscriptionUrl: widget.subscriptionUrl, storeId: widget.storeId, createAccount: widget.createAccount!,
+                  guestId: widget.guestId,
                 );
                 // _redirect(url.toString());
               },
@@ -165,6 +168,7 @@ class PaymentScreenState extends State<PaymentWebViewScreen> {
         maxCodOrderAmount: _maximumCodOrderAmount,
         orderType: widget.orderModel.orderType,
         isCashOnDelivery: widget.isCashOnDelivery,
+        guestId: widget.guestId,
       ));
     }else{
       return Get.dialog(FundPaymentDialogWidget(isSubscription: widget.subscriptionUrl != null && widget.subscriptionUrl!.isNotEmpty));

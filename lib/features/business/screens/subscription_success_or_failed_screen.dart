@@ -151,7 +151,7 @@ class _SubscriptionSuccessOrFailedScreenState extends State<SubscriptionSuccessO
 
                           TextButton(
                             onPressed: () {
-                              Get.toNamed(RouteHelper.getBusinessPlanRoute(widget.storeId));
+                              // Get.toNamed(RouteHelper.getBusinessPlanRoute(widget.storeId));
                             },
                             child: Text(
                               'try_again'.tr,

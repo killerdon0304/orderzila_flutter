@@ -38,12 +38,13 @@ class BottomSection extends StatelessWidget {
   final Widget? checkoutButton;
   final bool isPrescriptionRequired;
   final double referralDiscount;
+  final double variationPrice;
 
   const BottomSection({super.key, required this.checkoutController, required this.total, required this.module, required this.subTotal,
     required this.discount, required this.couponController, required this.taxIncluded, required this.tax,
     required this.deliveryCharge, required this.todayClosed, required this.tomorrowClosed,
     required this.orderAmount, this.maxCodOrderAmount, this.storeId, this.taxPercent, required this.price,
-    required this.addOns, this.checkoutButton, required this.isPrescriptionRequired, required this.referralDiscount});
+    required this.addOns, this.checkoutButton, required this.isPrescriptionRequired, required this.referralDiscount, required this.variationPrice});
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +67,7 @@ class BottomSection extends StatelessWidget {
         /// Coupon
         isDesktop && !isGuestLoggedIn ? CouponSection(
           storeId: storeId, checkoutController: checkoutController, total: total, price: price,
-          discount: discount, addOns: addOns, deliveryCharge: deliveryCharge,
+          discount: discount, addOns: addOns, deliveryCharge: deliveryCharge, variationPrice: variationPrice,
         ) : const SizedBox(),
 
         Container(

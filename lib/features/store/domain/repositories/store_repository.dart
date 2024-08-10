@@ -24,7 +24,7 @@ class StoreRepository implements StoreRepositoryInterface {
     bool isFeaturedStoreList = false, bool isVisitAgainStoreList = false, bool isStoreRecommendedItemList = false, int? storeId,
     bool isStoreBannerList = false, bool isRecommendedStoreList = false}) async {
     if(isStoreList){
-      return await _getStoreList(offset!, filterBy!);
+      return await _getStoreList(offset!, filterBy!, type!);
     }else if(isPopularStoreList){
       return await _getPopularStoreList(type!);
     }else if(isLatestStoreList){
@@ -42,9 +42,9 @@ class StoreRepository implements StoreRepositoryInterface {
     }
   }
 
-  Future<StoreModel?> _getStoreList(int offset, String filterBy) async {
+  Future<StoreModel?> _getStoreList(int offset, String filterBy, String storeType) async {
     StoreModel? storeModel;
-    Response response = await apiClient.getData('${AppConstants.storeUri}/$filterBy?offset=$offset&limit=12');
+    Response response = await apiClient.getData('${AppConstants.storeUri}/$filterBy?store_type=$storeType&offset=$offset&limit=12');
     if(response.statusCode == 200){
       storeModel = StoreModel.fromJson(response.body);
     }

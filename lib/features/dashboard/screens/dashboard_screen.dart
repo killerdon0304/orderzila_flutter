@@ -13,6 +13,7 @@ import 'package:sixam_mart/features/address/screens/address_screen.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/dashboard/widgets/bottom_nav_item_widget.dart';
 import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
+import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
@@ -138,6 +139,7 @@ class DashboardScreenState extends State<DashboardScreen> {
             } else {
               if(!ResponsiveHelper.isDesktop(context) && Get.find<SplashController>().module != null && Get.find<SplashController>().configModel!.module == null) {
                 Get.find<SplashController>().setModule(null);
+                Get.find<StoreController>().resetStoreData();
               }else {
                 if(_canExit) {
                   if (GetPlatform.isAndroid) {
@@ -266,7 +268,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       ),
                     ]),
 
-                  persistentContentHeight: (widget.fromSplash && Get.find<LocationController>().showLocationSuggestion && active) ? 0 : 100 ,
+                  persistentContentHeight: (widget.fromSplash && Get.find<LocationController>().showLocationSuggestion && active) ? 0 : GetPlatform.isIOS ? 110 : 100,
 
                   onIsContractedCallback: () {
                     if(!orderController.showOneOrder) {

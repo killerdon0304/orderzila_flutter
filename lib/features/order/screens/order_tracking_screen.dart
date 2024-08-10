@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
 
+import 'package:geolocator/geolocator.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
+import 'package:sixam_mart/features/location/widgets/permission_dialog_widget.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/notification/domain/models/notification_body_model.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
@@ -78,12 +82,14 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
         if(orderController.trackModel != null) {
           track = orderController.trackModel;
 
-          if (track!.store!.storeBusinessModel == 'commission') {
-            showChatPermission = true;
-          } else if (track.store!.storeSubscription != null && track.store!.storeBusinessModel == 'subscription') {
-            showChatPermission = track.store!.storeSubscription!.chat == 1;
-          } else {
-            showChatPermission = false;
+          if(track!.orderType != 'parcel') {
+            if (track.store!.storeBusinessModel == 'commission') {
+              showChatPermission = true;
+            } else if (track.store!.storeSubscription != null && track.store!.storeBusinessModel == 'subscription') {
+              showChatPermission = track.store!.storeSubscription!.chat == 1;
+            } else {
+              showChatPermission = false;
+            }
           }
         }
 
@@ -94,7 +100,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
               double.parse(track.deliveryAddress!.latitude!), double.parse(track.deliveryAddress!.longitude!),
             ), zoom: 16),
             minMaxZoomPreference: const MinMaxZoomPreference(0, 16),
-            zoomControlsEnabled: true,
+            zoomControlsEnabled: false,
             markers: _markers,
             onMapCreated: (GoogleMapController controller) {
               _controller = controller;
@@ -109,6 +115,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ) : track.deliveryAddress, track.orderType == 'take_away', track.orderType == 'parcel', track.moduleType == 'food',
               );
             },
+            style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
           ),
 
           _isLoading ? const Center(child: CircularProgressIndicator()) : const SizedBox(),
@@ -116,6 +123,30 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
           Positioned(
             top: Dimensions.paddingSizeSmall, left: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
             child: TrackingStepperWidget(status: track.orderStatus, takeAway: track.orderType == 'take_away'),
+          ),
+
+          Positioned(
+            right: 15, bottom: track.orderType != 'take_away' && track.deliveryMan == null ? 150 : 190,
+            child: InkWell(
+              onTap: () => _checkPermission(() async {
+                AddressModel address = await Get.find<LocationController>().getCurrentLocation(false, mapController: _controller);
+                setMarker(
+                  track!.orderType == 'parcel' ? Store(latitude: track.receiverDetails!.latitude, longitude: track.receiverDetails!.longitude,
+                      address: track.receiverDetails!.address, name: track.receiverDetails!.contactPersonName) : track.store, track.deliveryMan,
+                  track.orderType == 'take_away' ? Get.find<LocationController>().position.latitude == 0 ? track.deliveryAddress : AddressModel(
+                    latitude: Get.find<LocationController>().position.latitude.toString(),
+                    longitude: Get.find<LocationController>().position.longitude.toString(),
+                    address: Get.find<LocationController>().address,
+                  ) : track.deliveryAddress, track.orderType == 'take_away', track.orderType == 'parcel', track.moduleType == 'food',
+                  currentAddress: address, fromCurrentLocation: true,
+                );
+              }),
+              child: Container(
+                padding: const EdgeInsets.all( Dimensions.paddingSizeSmall),
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(50), color: Colors.white),
+                child: Icon(Icons.my_location_outlined, color: Theme.of(context).primaryColor, size: 25),
+              ),
+            ),
           ),
 
           Positioned(
@@ -135,7 +166,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  void setMarker(Store? store, DeliveryMan? deliveryMan, AddressModel? addressModel, bool takeAway, bool parcel, bool isRestaurant) async {
+  void setMarker(Store? store, DeliveryMan? deliveryMan, AddressModel? addressModel, bool takeAway, bool parcel, bool isRestaurant, {AddressModel? currentAddress, bool fromCurrentLocation = false}) async {
     try {
 
       BitmapDescriptor restaurantImageData = await MarkerHelper.convertAssetToBitmapDescriptor(
@@ -150,7 +181,7 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
         width: 100, imagePath: takeAway ? Images.myLocationMarker : Images.userMarker,
       );
 
-      // Animate to coordinate
+      /// Animate to coordinate
       LatLngBounds? bounds;
       double rotation = 0;
       if(_controller != null) {
@@ -173,22 +204,53 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
         (bounds.northeast.longitude + bounds.southwest.longitude)/2,
       );
 
-      _controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(target: centerBounds, zoom: GetPlatform.isWeb ? 10 : 17)));
-      if(!ResponsiveHelper.isWeb()) {
-        zoomToFit(_controller, bounds, centerBounds, padding: GetPlatform.isWeb ? 15 : 3);
+      if(fromCurrentLocation && currentAddress != null) {
+        LatLng currentLocation = LatLng(
+          double.parse(currentAddress.latitude!),
+          double.parse(currentAddress.longitude!),
+        );
+        _controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(target: currentLocation, zoom: GetPlatform.isWeb ? 7 : 15)));
+      }
+
+      if(!fromCurrentLocation) {
+        _controller!.moveCamera(CameraUpdate.newCameraPosition(CameraPosition(target: centerBounds, zoom: GetPlatform.isWeb ? 10 : 17)));
+        if(!ResponsiveHelper.isWeb()) {
+          zoomToFit(_controller, bounds, centerBounds, padding: GetPlatform.isWeb ? 15 : 3);
+        }
       }
 
       /// user for normal order , but sender for parcel order
       _markers = HashSet<Marker>();
-      addressModel != null ? _markers.add(Marker(
-        markerId: const MarkerId('destination'),
-        position: LatLng(double.parse(addressModel.latitude!), double.parse(addressModel.longitude!)),
-        infoWindow: InfoWindow(
-          title: parcel ? 'Sender' : 'Destination',
-          snippet: addressModel.address,
-        ),
-        icon: destinationImageData,
-      )) : const SizedBox();
+
+      ///current location marker set
+      if(currentAddress != null) {
+        _markers.add(Marker(
+          markerId: const MarkerId('current_location'),
+          visible: true,
+          draggable: false,
+          zIndex: 2,
+          flat: true,
+          anchor: const Offset(0.5, 0.5),
+          position: LatLng(
+            double.parse(currentAddress.latitude!),
+            double.parse(currentAddress.longitude!),
+          ),
+          icon: destinationImageData,
+        ));
+        setState(() {});
+      }
+
+      if(currentAddress == null){
+        addressModel != null ? _markers.add(Marker(
+          markerId: const MarkerId('destination'),
+          position: LatLng(double.parse(addressModel.latitude!), double.parse(addressModel.longitude!)),
+          infoWindow: InfoWindow(
+            title: parcel ? 'Sender' : 'Destination',
+            snippet: addressModel.address,
+          ),
+          icon: destinationImageData,
+        )) : const SizedBox();
+      }
 
       ///store for normal order , but receiver for parcel order
       store != null ? _markers.add(Marker(
@@ -249,6 +311,20 @@ class OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final bool southWestLongitudeCheck = screenBounds.southwest.longitude <= fitBounds.southwest.longitude;
 
     return northEastLatitudeCheck && northEastLongitudeCheck && southWestLatitudeCheck && southWestLongitudeCheck;
+  }
+
+  void _checkPermission(Function onTap) async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if(permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if(permission == LocationPermission.denied) {
+      showCustomSnackBar('you_have_to_allow'.tr);
+    }else if(permission == LocationPermission.deniedForever) {
+      Get.dialog(const PermissionDialogWidget());
+    }else {
+      onTap();
+    }
   }
 
 }

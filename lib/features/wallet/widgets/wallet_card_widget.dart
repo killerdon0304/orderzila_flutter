@@ -17,6 +17,8 @@ class WalletCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isDesktop = ResponsiveHelper.isDesktop(context);
+    final ScrollController cardScrollController = ScrollController();
+
     return GetBuilder<ProfileController>(
       builder: (profileController) {
         return Column(
@@ -70,8 +72,8 @@ class WalletCardWidget extends StatelessWidget {
                 child: InkWell(
                   onTap: () {
                     Get.dialog(
-                      const Dialog(backgroundColor: Colors.transparent, surfaceTintColor: Colors.transparent, child: SizedBox(
-                        width: 500, child: SingleChildScrollView(child: AddFundDialogueWidget()),
+                      Dialog(backgroundColor: Colors.transparent, surfaceTintColor: Colors.transparent, child: SizedBox(
+                        width: 500, child: SingleChildScrollView(controller: cardScrollController, child: AddFundDialogueWidget(cardScrollController: cardScrollController)),
                       )),
                     );
                   },

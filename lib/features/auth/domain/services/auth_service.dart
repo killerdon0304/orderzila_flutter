@@ -120,8 +120,8 @@ class AuthService implements AuthServiceInterface{
   }
 
   @override
-  bool clearSharedData() {
-    return authRepositoryInterface.clearSharedData();
+  Future<bool> clearSharedData() async {
+    return await authRepositoryInterface.clearSharedData();
   }
 
   @override
@@ -196,7 +196,13 @@ class AuthService implements AuthServiceInterface{
   }
 
   @override
-  void setNotificationActive(bool isActive) {
-    authRepositoryInterface.setNotificationActive(isActive);
+  Future<void> setNotificationActive(bool isActive) async {
+   await authRepositoryInterface.setNotificationActive(isActive);
   }
+
+  @override
+  Future<String?> saveDeviceToken() async {
+    return await authRepositoryInterface.saveDeviceToken();
+  }
+
 }

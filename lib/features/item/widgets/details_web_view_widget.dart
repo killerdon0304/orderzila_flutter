@@ -33,7 +33,9 @@ class DetailsWebViewWidget extends StatelessWidget {
     return GetBuilder<ItemController>(builder: (itemController) {
       List<String?> imageList = [];
       imageList.add(itemController.item!.imageFullUrl);
-      imageList.addAll(itemController.item!.imagesFullUrl!);
+      if(itemController.item!.imagesFullUrl != null) {
+        imageList.addAll(itemController.item!.imagesFullUrl!);
+      }
 
       return SingleChildScrollView(child: FooterView(
         child: ConstrainedBox(
@@ -251,7 +253,7 @@ class DetailsWebViewWidget extends StatelessWidget {
                                         cartController.clearCartOnline().then((success) async {
                                           if(success) {
                                             await cartController.addToCartOnline(cart!);
-                                            itemController.setExistInCart(itemController.item);
+                                            itemController.setExistInCart(itemController.item, null);
                                             showCartSnackBar();
                                           }
                                         });
@@ -261,7 +263,7 @@ class DetailsWebViewWidget extends StatelessWidget {
                                     if(itemController.cartIndex == -1) {
                                       await cartController.addToCartOnline(cart!).then((success) {
                                         if(success){
-                                          itemController.setExistInCart(itemController.item);
+                                          itemController.setExistInCart(itemController.item, null);
                                           showCartSnackBar();
                                         }
                                       });

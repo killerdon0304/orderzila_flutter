@@ -4,15 +4,16 @@ import 'package:sixam_mart/features/language/domain/models/language_model.dart';
 import 'package:sixam_mart/util/images.dart';
 
 class AppConstants {
-  static const String appName = 'orderzila';
-  static const double appVersion = 2.8;
+  static const String appName = '6amMart';
+  static const double appVersion = 2.9; ///Flutter Version: 3.22.3
 
   static const String fontFamily = 'Roboto';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-  static const String webHostedUrl = 'https://orderzila.com';
+  static const String webHostedUrl = 'https://6ammart-web.6amtech.com';
+  static const bool useReactWebsite = false;
 
-  static const String baseUrl = 'https://orderzila.com/zila';
+  static const String baseUrl = 'https://6ammart-admin.6amtech.com';
   static const String categoryUri = '/api/v1/categories';
   static const String bannerUri = '/api/v1/banners';
   static const String storeItemUri = '/api/v1/items/latest';
@@ -138,6 +139,9 @@ class AppConstants {
   static const String getCashBackAmountUri = '/api/v1/cashback/getCashback';
   static const String brandListUri = '/api/v1/brand';
   static const String brandItemUri = '/api/v1/brand/items';
+  static const String advertisementListUri = '/api/v1/advertisement/list';
+  static const String searchSuggestionsUri = '/api/v1/items/item-or-store-search';
+  static const String searchPopularCategoriesUri = '/api/v1/categories/popular';
 
   ///Subscription
   static const String businessPlanUri = '/api/v1/vendor/business_plan';
@@ -158,29 +162,31 @@ class AppConstants {
   static const String removeItemCartUri = '/api/v1/customer/cart/remove-item';
 
   /// Shared Key
-  static const String theme = 'orderzila_theme';
-  static const String token = 'orderzila_token';
-  static const String countryCode = 'orderzila_country_code';
-  static const String languageCode = 'orderzila_language_code';
-  static const String cartList = 'orderzila_cart_list';
-  static const String userPassword = 'orderzila_user_password';
-  static const String userAddress = 'orderzila_user_address';
-  static const String userNumber = 'orderzila_user_number';
-  static const String userCountryCode = 'orderzila_user_country_code';
-  static const String notification = 'orderzila_notification';
-  static const String searchHistory = 'orderzila_search_history';
-  static const String intro = 'orderzila_intro';
-  static const String notificationCount = 'orderzila_notification_count';
-  static const String dmTipIndex = 'orderzila_dm_tip_index';
-  static const String earnPoint = 'orderzila_earn_point';
-  static const String acceptCookies = 'orderzila_accept_cookies';
-  static const String suggestedLocation = 'orderzila_suggested_location';
-  static const String walletAccessToken = 'orderzila_wallet_access_token';
-  static const String guestId = 'orderzila_guest_id';
-  static const String guestNumber = 'orderzila_guest_number';
-  static const String referBottomSheet = 'orderzila_reffer_bottomsheet_show';
-  static const String dmRegisterSuccess = 'orderzila_dm_registration_success';
-  static const String isRestaurantRegister = 'orderzila_store_registration';
+  static const String theme = '6ammart_theme';
+  static const String token = '6ammart_token';
+  static const String countryCode = '6ammart_country_code';
+  static const String languageCode = '6ammart_language_code';
+  static const String cacheCountryCode = 'cache_country_code';
+  static const String cacheLanguageCode = 'cache_language_code';
+  static const String cartList = '6ammart_cart_list';
+  static const String userPassword = '6ammart_user_password';
+  static const String userAddress = '6ammart_user_address';
+  static const String userNumber = '6ammart_user_number';
+  static const String userCountryCode = '6ammart_user_country_code';
+  static const String notification = '6ammart_notification';
+  static const String searchHistory = '6ammart_search_history';
+  static const String intro = '6ammart_intro';
+  static const String notificationCount = '6ammart_notification_count';
+  static const String dmTipIndex = '6ammart_dm_tip_index';
+  static const String earnPoint = '6ammart_earn_point';
+  static const String acceptCookies = '6ammart_accept_cookies';
+  static const String suggestedLocation = '6ammart_suggested_location';
+  static const String walletAccessToken = '6ammart_wallet_access_token';
+  static const String guestId = '6ammart_guest_id';
+  static const String guestNumber = '6ammart_guest_number';
+  static const String referBottomSheet = '6ammart_reffer_bottomsheet_show';
+  static const String dmRegisterSuccess = '6ammart_dm_registration_success';
+  static const String isRestaurantRegister = '6ammart_store_registration';
 
   static const String topic = 'all_zone_customer';
   static const String zoneId = 'zoneId';
@@ -241,8 +247,8 @@ class AppConstants {
   static List<LanguageModel> languages = [
     LanguageModel(imageUrl: Images.english, languageName: 'English', countryCode: 'US', languageCode: 'en'),
     LanguageModel(imageUrl: Images.arabic, languageName: 'عربى', countryCode: 'SA', languageCode: 'ar'),
-    // LanguageModel(imageUrl: Images.arabic, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
-    // LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
+    LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
+    LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
   ];
 
   static List<String> joinDropdown = [

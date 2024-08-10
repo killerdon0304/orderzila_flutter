@@ -22,10 +22,11 @@ abstract class ItemServiceInterface {
   List<int> initializeVariationIndexes(List<ChoiceOptions>? choiceOptions);
   List<bool> initializeAddonActiveList(List<AddOns>? addOns);
   List<int> initializeAddonQtyList(List<AddOns>? addOns);
-  String prepareVariationType(List<ChoiceOptions>? choiceOptions, List<int>? variationIndex);
+  Future<String> prepareVariationType(List<ChoiceOptions>? choiceOptions, List<int>? variationIndex);
   int setAddOnQuantity(bool isIncrement, int addOnQty);
   int setQuantity(bool isIncrement, bool moduleStock, int? stock, int qty, int? quantityLimit, {bool getxSnackBar = false});
   List<List<bool?>> setNewCartVariationIndex(int index, int i, List<FoodVariation>? foodVariations, List<List<bool?>> selectedVariations);
   int selectedVariationLength(List<List<bool?>> selectedVariations, int index);
   double? getStartingPrice(Item item);
+  Future<int> isExistInCartForBottomSheet(List<CartModel> cartList, int? itemId, int? cartIndex, List<List<bool?>>? variations);
 }

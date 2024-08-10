@@ -32,6 +32,8 @@ class BestStoreNearbyView extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isPharmacy = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.pharmacy;
     bool isFood = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.food;
+    final bool ltr = Get.find<LocalizationController>().isLtr;
+
 
     return GetBuilder<StoreController>(builder: (storeController) {
       List<Store>? storeList = isPharmacy ? storeController.featuredStoreList : storeController.popularStoreList;
@@ -49,7 +51,8 @@ class BestStoreNearbyView extends StatelessWidget {
                 onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute(isPharmacy ? 'featured' : 'popular', isNearbyStore: true)),
               ),
             ) : Padding(
-              padding: const EdgeInsets.only(top: Dimensions.paddingSizeDefault, left: Dimensions.paddingSizeLarge, right: Dimensions.paddingSizeDefault),
+              padding: EdgeInsets.only(top: Dimensions.paddingSizeDefault, left: ltr ? Dimensions.paddingSizeLarge : Dimensions.paddingSizeDefault,
+                  right: ltr ? Dimensions.paddingSizeDefault : Dimensions.paddingSizeLarge),
               child: FittedBox(
                 child: Row(children: [
 
@@ -63,7 +66,7 @@ class BestStoreNearbyView extends StatelessWidget {
                   InkWell(
                     onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute('popular', isNearbyStore: true)),
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(10, 5, 0, 5),
+                      padding: EdgeInsets.fromLTRB(ltr ? 10 : 0, 5, ltr ? 0 : 10, 5),
                       child: Text(
                         'see_all'.tr,
                         style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).primaryColor, decoration: TextDecoration.underline),
@@ -181,7 +184,7 @@ class BestStoreNearbyView extends StatelessWidget {
                                           const SizedBox(width: Dimensions.paddingSizeExtraSmall),
                                           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                                            Column(children: [
+                                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
                                               Text('start_from'.tr, style: robotoRegular.copyWith(color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeSmall)),
                                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -191,7 +194,7 @@ class BestStoreNearbyView extends StatelessWidget {
                                             ]),
                                             const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                                            Row(children: [
+                                            storeList[index].ratingCount! > 0 ? Row(mainAxisAlignment: MainAxisAlignment.start, children: [
 
                                               Icon(Icons.star, size: 15, color: Theme.of(context).primaryColor),
                                               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -201,7 +204,7 @@ class BestStoreNearbyView extends StatelessWidget {
 
                                               Text("(${storeList[index].ratingCount.toString()})", style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor)),
 
-                                            ]),
+                                            ]) : const SizedBox(),
                                           ]),
 
                                         ]),
@@ -286,7 +289,7 @@ class BestStoreNearbyView extends StatelessWidget {
                                   onTap: () {
                                     if(AuthHelper.isLoggedIn()) {
                                       isWished ? favouriteController.removeFromFavouriteList(storeList[index].id, true)
-                                          : favouriteController.addToFavouriteList(null, storeList[index], true);
+                                          : favouriteController.addToFavouriteList(null, storeList[index].id, true);
                                     }else {
                                       showCustomSnackBar('you_are_not_logged_in'.tr);
                                     }

@@ -199,4 +199,8 @@ class DateConverter {
     }
   }
 
+  static String convertRestaurantOpenTime(String time) {
+    return DateFormat('hh:mm a').format(DateFormat('HH:mm:ss').parse(time).toLocal());
+  }
+
 }

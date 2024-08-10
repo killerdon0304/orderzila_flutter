@@ -1,5 +1,7 @@
 import 'package:sixam_mart/features/banner/controllers/banner_controller.dart';
+import 'package:sixam_mart/features/home/widgets/all_store_filter_widget.dart';
 import 'package:sixam_mart/features/home/widgets/web/web_brands_view_widget.dart';
+import 'package:sixam_mart/features/home/widgets/web/web_highlight_widget.dart';
 import 'package:sixam_mart/features/item/controllers/campaign_controller.dart';
 import 'package:sixam_mart/features/category/controllers/category_controller.dart';
 import 'package:sixam_mart/features/flash_sale/controllers/flash_sale_controller.dart';
@@ -28,12 +30,10 @@ import 'package:sixam_mart/features/home/widgets/web/web_promotional_banner_view
 import 'package:sixam_mart/features/home/widgets/web/web_recomanded_store_view_widget.dart';
 import 'package:sixam_mart/features/home/widgets/web/web_special_offer_view_widget.dart';
 import 'package:sixam_mart/features/home/widgets/web/web_visit_again_view_widget.dart';
-import 'package:sixam_mart/features/home/widgets/web/widgets/store_sorting_button.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
-import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/common/widgets/item_view.dart';
 import 'package:sixam_mart/common/widgets/paginated_list_view.dart';
@@ -88,152 +88,177 @@ class _WebNewHomeScreenState extends State<WebNewHomeScreen> {
 
       SizedBox(height: context.height),
 
-      SingleChildScrollView(
+      CustomScrollView(
         controller: widget.scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
-        child: Column(children: [
+        slivers: [
+          SliverToBoxAdapter(
+            child: Center(
+              child: SizedBox(width: Dimensions.webMaxWidth, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-          FooterView(child: SizedBox(width: Dimensions.webMaxWidth, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Row(crossAxisAlignment : CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
+                  Expanded(
+                    flex: 3,
+                    child: GetBuilder<BannerController>(builder: (bannerController) {
+                      return bannerController.bannerImageList == null ?  const WebNewBannerViewWidget(isFeatured: false)
+                          : bannerController.bannerImageList!.isEmpty ? const SizedBox() : const WebNewBannerViewWidget(isFeatured: false);
+                    }),
+                  ),
+                  const SizedBox(width: Dimensions.paddingSizeDefault),
 
-            Row(crossAxisAlignment : CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
-              Expanded(
-                flex: 3,
-                child: GetBuilder<BannerController>(builder: (bannerController) {
-                  return bannerController.bannerImageList == null ?  const WebNewBannerViewWidget(isFeatured: false)
-                      : bannerController.bannerImageList!.isEmpty ? const SizedBox() : const WebNewBannerViewWidget(isFeatured: false);
+                  GetBuilder<StoreController>(
+                      builder: (storeController) {
+                        return GetBuilder<FlashSaleController>(
+                            builder: (flashController) {
+                              bool isFlashSaleActive = (flashController.flashSaleModel?.activeProducts != null && flashController.flashSaleModel!.activeProducts!.isNotEmpty);
+                              return Expanded(
+                                flex: 1,
+                                child: isFlashSaleActive ? const WebFlashSaleViewWidget() : const WebRecommendedStoreView(),
+                              );
+                            }
+                        );
+                      }
+                  ),
+                ]),
+
+                const BadWeatherWidget(),
+
+                GetBuilder<CategoryController>(builder: (categoryController) {
+                  return categoryController.categoryList == null ? WebCategoryViewWidget(categoryController: categoryController)
+                      : categoryController.categoryList!.isEmpty ? const SizedBox() : WebCategoryViewWidget(categoryController: categoryController);
                 }),
-              ),
-              const SizedBox(width: Dimensions.paddingSizeDefault),
 
-              GetBuilder<StoreController>(
-                builder: (storeController) {
-                  return GetBuilder<FlashSaleController>(
-                    builder: (flashController) {
-                      bool isFlashSaleActive = (flashController.flashSaleModel?.activeProducts != null && flashController.flashSaleModel!.activeProducts!.isNotEmpty);
-                      return Expanded(
-                        flex: 1,
-                          child: isFlashSaleActive ? const WebFlashSaleViewWidget() : const WebRecommendedStoreView(),
-                      );
-                    }
-                  );
-                }
-              ),
-            ]),
+                _isLogin ?  WebVisitAgainView(fromFood: isFood) : const SizedBox(),
 
-            const BadWeatherWidget(),
+                isPharmacy ? const WebBasicMedicineNearbyViewWidget()
+                    : isShop ? const WebMostPopularItemViewWidget(isShop: true, isFood: false)
+                    : const WebSpecialOfferView(isFood: false, isShop: false),
 
-            GetBuilder<CategoryController>(builder: (categoryController) {
-              return categoryController.categoryList == null ? WebCategoryViewWidget(categoryController: categoryController)
-                  : categoryController.categoryList!.isEmpty ? const SizedBox() : WebCategoryViewWidget(categoryController: categoryController);
-            }),
+                const WebHighlightWidget(),
 
-            _isLogin ?  WebVisitAgainView(fromFood: isFood) : const SizedBox(),
+                (isPharmacy || isShop) ? const MiddleSectionMultipleBannerViewWidget()
+                    : isFood ? const WebBestReviewItemViewWidget()
+                    : const WebBestStoreNearbyViewWidget(),
 
-            isPharmacy ? const WebBasicMedicineNearbyViewWidget()
-                : isShop ? const WebMostPopularItemViewWidget(isShop: true, isFood: false)
-                : const WebSpecialOfferView(isFood: false, isShop: false),
+                isPharmacy ? const WebBestStoreNearbyViewWidget()
+                    : isFood ? const WebNewOnViewWidget(isFood: true)
+                    : isShop ? const WebPopularStoresView()
+                    : const WebMostPopularItemViewWidget(isFood: false, isShop: false),
 
-            (isPharmacy || isShop) ? const MiddleSectionMultipleBannerViewWidget()
-                : isFood ? const WebBestReviewItemViewWidget()
-                : const WebBestStoreNearbyViewWidget(),
+                isShop ? const WebBrandsViewWidget() : (isPharmacy || isFood) ? const SizedBox() : const SizedBox(),
 
-            isPharmacy ? const WebBestStoreNearbyViewWidget()
-                : isFood ? const WebNewOnViewWidget(isFood: true)
-                : isShop ? const WebPopularStoresView()
-                : const WebMostPopularItemViewWidget(isFood: false, isShop: false),
-
-            isShop ? const WebBrandsViewWidget() : (isPharmacy || isFood) ? const SizedBox() : const SizedBox(),
-
-            isPharmacy ? const WebJustForYouViewWidget()
-                : isFood ? const WebItemThatYouLoveViewWidget()
-                : isShop ? const WebSpecialOfferView(isFood: false, isShop: true)
-                : GetBuilder<CampaignController>(builder: (campaignController) {
+                isPharmacy ? const WebJustForYouViewWidget()
+                    : isFood ? const WebItemThatYouLoveViewWidget()
+                    : isShop ? const WebSpecialOfferView(isFood: false, isShop: true)
+                    : GetBuilder<CampaignController>(builder: (campaignController) {
                   return campaignController.basicCampaignList == null ?  WebMostPopularItemBannerViewWidget(campaignController: campaignController)
-                  : campaignController.basicCampaignList!.isEmpty ? const SizedBox()
+                      : campaignController.basicCampaignList!.isEmpty ? const SizedBox()
                       : WebMostPopularItemBannerViewWidget(campaignController: campaignController);
-            }),
+                }),
 
-            isPharmacy ? const WebNewOnViewWidget()
-                : isFood ? const WebMostPopularItemViewWidget(isFood: true, isShop: false)
-                : isShop ? const WebBestReviewItemViewWidget()
-                : const WebBestReviewItemViewWidget(),
+                isPharmacy ? const WebNewOnViewWidget()
+                    : isFood ? const WebMostPopularItemViewWidget(isFood: true, isShop: false)
+                    : isShop ? const WebBestReviewItemViewWidget()
+                    : const WebBestReviewItemViewWidget(),
 
-            isPharmacy ? const WebCommonConditionViewWidget()
-                : isFood ? const WebJustForYouViewWidget()
-                : isShop ? const WebJustForYouViewWidget()
-                : /*const WebStoreWiseBannerView(),*/ const SizedBox(),
+                isPharmacy ? const WebCommonConditionViewWidget()
+                    : isFood ? const WebJustForYouViewWidget()
+                    : isShop ? const WebJustForYouViewWidget()
+                    : /*const WebStoreWiseBannerView(),*/ const SizedBox(),
 
-            isPharmacy ? const SizedBox()
-                : isFood ? const WebNewOnMartViewWidget()
-                : isShop ? const  WebFeaturedCategoriesViewWidget()
-                : const WebJustForYouViewWidget(),
+                isPharmacy ? const SizedBox()
+                    : isFood ? const WebNewOnMartViewWidget()
+                    : isShop ? const  WebFeaturedCategoriesViewWidget()
+                    : const WebJustForYouViewWidget(),
 
-            (isPharmacy || isFood) ? const SizedBox() : isShop ? /*const WebStoreWiseBannerView()*/ const SizedBox() : const WebItemThatYouLoveViewWidget(),
+                (isPharmacy || isFood) ? const SizedBox() : isShop ? /*const WebStoreWiseBannerView()*/ const SizedBox() : const WebItemThatYouLoveViewWidget(),
 
-            (isPharmacy || isFood) ? const SizedBox() : isShop ? const WebItemThatYouLoveForShop() : isLoggedIn ? const WebCouponBannerViewWidget() : const SizedBox(),
+                (isPharmacy || isFood) ? const SizedBox() : isShop ? const WebItemThatYouLoveForShop() : isLoggedIn ? const WebCouponBannerViewWidget() : const SizedBox(),
 
-            (isPharmacy || isFood) ? const SizedBox() : isShop ? const WebNewOnViewWidget() : const WebNewOnMartViewWidget(),
+                (isPharmacy || isFood) ? const SizedBox() : isShop ? const WebNewOnViewWidget() : const WebNewOnMartViewWidget(),
 
-            isFood ? const SizedBox() : const WebPromotionalBannerView(),
+                isFood ? const SizedBox() : const WebPromotionalBannerView(),
 
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 20, 0, 5),
-              child: GetBuilder<StoreController>(builder: (storeController) {
-                return Row(children: [
-                  Expanded(child: Text(
-                    '${storeController.storeModel?.totalSize ?? 0} ${Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'restaurants'.tr : 'stores'.tr}',
-                    style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
-                  )),
+                // Padding(
+                //   padding: const EdgeInsets.fromLTRB(10, 20, 0, 5),
+                //   child: GetBuilder<StoreController>(builder: (storeController) {
+                //     return Row(children: [
+                //       Expanded(child: Text(
+                //         '${storeController.storeModel?.totalSize ?? 0} ${Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'restaurants'.tr : 'stores'.tr}',
+                //         style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
+                //       )),
+                //
+                //       storeController.storeModel != null ? Row(children: [
+                //         InkWell(
+                //           onTap: () => storeController.setFilterType('all'),
+                //           child: StoreSortingButton(
+                //             storeType: 'all',
+                //             storeTypeText: 'all'.tr,
+                //           ),
+                //         ),
+                //         const SizedBox(width: Dimensions.paddingSizeSmall),
+                //
+                //         InkWell(
+                //           onTap: () => storeController.setFilterType('delivery'),
+                //           child: StoreSortingButton(
+                //             storeType: 'delivery',
+                //             storeTypeText: 'delivery'.tr,
+                //           ),
+                //         ),
+                //         const SizedBox(width: Dimensions.paddingSizeSmall),
+                //
+                //         InkWell(
+                //           onTap: () => storeController.setFilterType('take_away'),
+                //           child: StoreSortingButton(
+                //             storeType: 'take_away',
+                //             storeTypeText: 'take_away'.tr,
+                //           ),
+                //         ),
+                //       ]) : const SizedBox(),
+                //     ]);
+                //   }),
+                // ),
 
-                  storeController.storeModel != null ? Row(children: [
-                    InkWell(
-                      onTap: () => storeController.setStoreType('all'),
-                      child: StoreSortingButton(
-                        storeType: 'all',
-                        storeTypeText: 'all'.tr,
-                      ),
-                    ),
-                    const SizedBox(width: Dimensions.paddingSizeSmall),
-
-                    InkWell(
-                      onTap: () => storeController.setStoreType('delivery'),
-                      child: StoreSortingButton(
-                        storeType: 'delivery',
-                        storeTypeText: 'delivery'.tr,
-                      ),
-                    ),
-                    const SizedBox(width: Dimensions.paddingSizeSmall),
-
-                    InkWell(
-                      onTap: () => storeController.setStoreType('take_away'),
-                      child: StoreSortingButton(
-                        storeType: 'take_away',
-                        storeTypeText: 'take_away'.tr,
-                      ),
-                    ),
-                  ]) : const SizedBox(),
-                ]);
-              }),
+              ])),
             ),
+          ),
 
-            GetBuilder<StoreController>(builder: (storeController) {
-              return PaginatedListView(
-                scrollController: widget.scrollController,
-                totalSize: storeController.storeModel?.totalSize,
-                offset: storeController.storeModel?.offset,
-                onPaginate: (int? offset) async => await storeController.getStoreList(offset!, false),
-                itemView: ItemsView(
-                  isStore: true, items: null,
-                  stores: storeController.storeModel?.stores,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall,
-                    vertical: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : 0,
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: SliverDelegate(
+              height: 85,
+              // callback: (val) {
+              //   searchBgShow = val;
+              // },
+              child: const AllStoreFilterWidget(),
+            ),
+          ),
+
+          SliverToBoxAdapter(
+            child: GetBuilder<StoreController>(builder: (storeController) {
+              return FooterView(
+                child: SizedBox(
+                  width: Dimensions.webMaxWidth,
+                  child: PaginatedListView(
+                    scrollController: widget.scrollController,
+                    totalSize: storeController.storeModel?.totalSize,
+                    offset: storeController.storeModel?.offset,
+                    onPaginate: (int? offset) async => await storeController.getStoreList(offset!, false),
+                    itemView: ItemsView(
+                      isStore: true, items: null,
+                      stores: storeController.storeModel?.stores,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : Dimensions.paddingSizeSmall,
+                        vertical: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeExtraSmall : 0,
+                      ),
+                    ),
                   ),
                 ),
               );
             }),
-          ]))),
-        ]),
+          ),
+
+        ],
       ),
 
       const Positioned(right: 0, top: 0, bottom: 0, child: Center(child: ModuleWidget())),
@@ -244,8 +269,9 @@ class _WebNewHomeScreenState extends State<WebNewHomeScreen> {
 
 class SliverDelegate extends SliverPersistentHeaderDelegate {
   Widget child;
+  double height;
 
-  SliverDelegate({required this.child});
+  SliverDelegate({required this.child, this.height = 50});
 
   @override
   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
@@ -253,13 +279,13 @@ class SliverDelegate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get maxExtent => 50;
+  double get maxExtent => height;
 
   @override
-  double get minExtent => 50;
+  double get minExtent => height;
 
   @override
   bool shouldRebuild(SliverDelegate oldDelegate) {
-    return oldDelegate.maxExtent != 50 || oldDelegate.minExtent != 50 || child != oldDelegate.child;
+    return oldDelegate.maxExtent != height || oldDelegate.minExtent != height || child != oldDelegate.child;
   }
 }

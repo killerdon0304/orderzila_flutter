@@ -70,7 +70,7 @@ class CommonConditionView extends StatelessWidget {
                 ]),
               ),
 
-              itemController.conditionWiseProduct != null && itemController.conditionWiseProduct!.isNotEmpty ? GridView.builder(
+              itemController.conditionWiseProduct != null ? itemController.conditionWiseProduct!.isNotEmpty ? GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: ResponsiveHelper.isMobile(context) ? 2 : 4,
                   crossAxisSpacing: Dimensions.paddingSizeDefault,
@@ -85,9 +85,9 @@ class CommonConditionView extends StatelessWidget {
                   return MedicineItemCard(item: itemController.conditionWiseProduct![index]);
                 },
               ) : Center(child: Padding(
-                padding: const EdgeInsets.all(Dimensions.paddingSizeDefault),
+                padding: const EdgeInsets.all(100),
                 child: Text('no_product_available'.tr),
-              )),
+              )) : const MedicineCardShimmer(),
 
             ]),
           ),

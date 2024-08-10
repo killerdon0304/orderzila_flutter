@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sixam_mart/features/business/controllers/business_controller.dart';
+import 'package:sixam_mart/features/business/domain/models/package_model.dart';
 import 'package:sixam_mart/features/home/controllers/home_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/location/domain/services/location_service_interface.dart';
@@ -80,6 +82,24 @@ class StoreRegistrationController extends GetxController implements GetxService 
 
   bool _inZone = false;
   bool get inZone => _inZone;
+
+  int _businessIndex = 0;
+  int get businessIndex => _businessIndex;
+
+  int _activeSubscriptionIndex = 0;
+  int get activeSubscriptionIndex => _activeSubscriptionIndex;
+
+  String _businessPlanStatus = 'business';
+  String get businessPlanStatus => _businessPlanStatus;
+
+  int _paymentIndex = 0;
+  int get paymentIndex => _paymentIndex;
+
+  String? _digitalPaymentName;
+  String? get digitalPaymentName => _digitalPaymentName;
+
+  PackageModel? _packageModel;
+  PackageModel? get packageModel => _packageModel;
 
   void showHidePass({bool isUpdate = true}){
     _showPassView = ! _showPassView;
@@ -245,9 +265,61 @@ class StoreRegistrationController extends GetxController implements GetxService 
     if(response.statusCode == 200) {
       Get.find<HomeController>().saveRegistrationSuccessfulSharedPref(true);
       int? storeId = response.body['store_id'];
-      Get.offAllNamed(RouteHelper.getBusinessPlanRoute(storeId));
+      int? packageId = response.body['package_id'];
+      if(packageId == null) {
+        Get.find<BusinessController>().submitBusinessPlan(storeId: storeId!, packageId: null);
+      } else {
+        Get.toNamed(RouteHelper.getSubscriptionPaymentRoute(
+          storeId: storeId,
+          packageId: packageId,
+        ));
+      }
+      // Get.offAllNamed(RouteHelper.getBusinessPlanRoute(storeId, packageId));
     }
     _isLoading = false;
+    update();
+  }
+
+  void resetBusiness(){
+    _businessIndex = Get.find<SplashController>().configModel!.commissionBusinessModel == 0 ? 1 : 0;
+    _activeSubscriptionIndex = 0;
+    _businessPlanStatus = 'business';
+    // _isFirstTime = true;
+    _paymentIndex = Get.find<SplashController>().configModel!.subscriptionFreeTrialStatus??false ? 1 : 0;
+  }
+
+  Future<void> getPackageList({bool isUpdate = true}) async {
+    _packageModel = await storeRegistrationServiceInterface.getPackageList();
+    if(isUpdate) {
+      update();
+    }
+  }
+
+  void changeDigitalPaymentName(String? name, {bool canUpdate = true}){
+    _digitalPaymentName = name;
+    if(canUpdate) {
+      update();
+    }
+  }
+
+  void setPaymentIndex(int index){
+    _paymentIndex = index;
+    update();
+  }
+
+  void setBusiness(int business){
+    _activeSubscriptionIndex = 0;
+    _businessIndex = business;
+    update();
+  }
+
+  void setBusinessStatus(String status){
+    _businessPlanStatus = status;
+    update();
+  }
+
+  void selectSubscriptionCard(int index){
+    _activeSubscriptionIndex = index;
     update();
   }
 

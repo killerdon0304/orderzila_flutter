@@ -20,7 +20,8 @@ import 'package:sixam_mart/common/widgets/not_available_widget.dart';
 
 class ItemThatYouLoveCard extends StatelessWidget {
   final Item item;
-  const ItemThatYouLoveCard({super.key, required this.item,});
+  final int? index;
+  const ItemThatYouLoveCard({super.key, required this.item, this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -78,6 +79,7 @@ class ItemThatYouLoveCard extends StatelessWidget {
                   bottom: -10, left: 0, right: 0,
                   child: CartCountView(
                     item: item,
+                    index: index,
                     child: Center(
                       child: Container(
                         alignment: Alignment.center,

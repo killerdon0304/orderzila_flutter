@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:sixam_mart/common/widgets/hover/text_hover.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
@@ -7,6 +8,7 @@ import 'package:sixam_mart/features/location/controllers/location_controller.dar
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/auth/screens/sign_in_screen.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
+import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -40,15 +42,18 @@ class WebMenuBar extends StatelessWidget implements PreferredSizeWidget {
                       child: GetBuilder<LocationController>(builder: (locationController) {
                         return Row(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Icon(
+                            AuthHelper.isLoggedIn() ? Icon(
                               AddressHelper.getUserAddressFromSharedPref()!.addressType == 'home' ? Icons.home_filled
                                   : AddressHelper.getUserAddressFromSharedPref()!.addressType == 'office' ? Icons.work : Icons.location_on,
+                              size: 16, color: Theme.of(context).primaryColor,
+                            ) : Icon(
+                              Icons.location_on,
                               size: 16, color: Theme.of(context).primaryColor,
                             ),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                             Text(
-                              '${AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr}: ',
+                              '${AuthHelper.isLoggedIn() ? AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr : 'your_location'.tr}: ',
                               style: robotoMedium.copyWith(
                                 color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall,
                               ),
@@ -109,7 +114,7 @@ class WebMenuBar extends StatelessWidget implements PreferredSizeWidget {
                             AppConstants.languages[index].languageCode!,
                             AppConstants.languages[index].countryCode,
                           ));
-                          localizationController.setSelectIndex(index);
+                          localizationController.setSelectLanguageIndex(index);
                         },
                         dropdownButtonStyle: DropdownButtonStyle(
                           height: 50,
@@ -128,12 +133,12 @@ class WebMenuBar extends StatelessWidget implements PreferredSizeWidget {
                         items: languageList,
                         child: Row(
                           children: [
-                            SizedBox(height: 15, width: 15, child: Image.asset(AppConstants.languages[localizationController.selectedIndex].imageUrl!)),
+                            SizedBox(height: 15, width: 15, child: Image.asset(AppConstants.languages[localizationController.selectedLanguageIndex].imageUrl!)),
 
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text(
-                                AppConstants.languages[localizationController.selectedIndex].languageName!,
+                                AppConstants.languages[localizationController.selectedLanguageIndex].languageName!,
                                 style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeExtraSmall),
                               ),
                             ),
@@ -223,23 +228,70 @@ class WebMenuBar extends StatelessWidget implements PreferredSizeWidget {
 
             Row(
               children: [
-                MenuButton(title: 'home'.tr, onTap: () => Get.toNamed(RouteHelper.getInitialRoute())),
+                MenuButton(title: 'home'.tr, onTap: () {
+                  if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                    Get.toNamed(RouteHelper.getInitialRoute());
+                  } else {
+                    showCustomSnackBar('please_select_address_first'.tr,);
+                  }
+                }),
                 const SizedBox(width: 20),
-                MenuButton(title: 'categories'.tr, onTap: () => Get.toNamed(RouteHelper.getCategoryRoute())),
+
+                MenuButton(title: 'categories'.tr, onTap: () {
+                  if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                    Get.toNamed(RouteHelper.getCategoryRoute());
+                  } else {
+                    showCustomSnackBar('please_select_address_first'.tr,);
+                  }
+                }),
                 const SizedBox(width: 20),
-                MenuButton(title: 'favourite'.tr, onTap: () => Get.toNamed(RouteHelper.getFavouriteScreen())),
+
+                MenuButton(title: 'favourite'.tr, onTap: () {
+                  if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                    Get.toNamed(RouteHelper.getFavouriteScreen());
+                  } else {
+                    showCustomSnackBar('please_select_address_first'.tr,);
+                  }
+                }),
                 const SizedBox(width: 20),
-                MenuButton(title: 'stores'.tr, onTap: () => Get.toNamed(RouteHelper.getAllStoreRoute('popular'))),
+
+                MenuButton(title: 'stores'.tr, onTap: () {
+                  if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                    Get.toNamed(RouteHelper.getAllStoreRoute('popular'));
+                  } else {
+                    showCustomSnackBar('please_select_address_first'.tr,);
+                  }
+                }),
                 const SizedBox(width: 20),
               ]
             ),
             const Expanded(child: SizedBox()),
 
-            MenuIconButton(icon: CupertinoIcons.search, onTap: () => Get.toNamed(RouteHelper.getSearchRoute())),
+            MenuIconButton(icon: CupertinoIcons.search, onTap: () {
+              if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                Get.toNamed(RouteHelper.getSearchRoute());
+              } else {
+                showCustomSnackBar('please_select_address_first'.tr,);
+              }
+            }),
             const SizedBox(width: 20),
-            MenuIconButton(icon: CupertinoIcons.bell_fill, onTap: () => Get.toNamed(RouteHelper.getNotificationRoute())),
+
+            MenuIconButton(icon: CupertinoIcons.bell_fill, onTap: () {
+              if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                Get.toNamed(RouteHelper.getNotificationRoute());
+              } else {
+                showCustomSnackBar('please_select_address_first'.tr,);
+              }
+            }),
             const SizedBox(width: 20),
-            MenuIconButton(icon: Icons.shopping_cart, isCart: true, onTap: () => Get.toNamed(RouteHelper.getCartRoute())),
+
+            MenuIconButton(icon: Icons.shopping_cart, isCart: true, onTap: () {
+              if(AddressHelper.getUserAddressFromSharedPref() != null) {
+                Get.toNamed(RouteHelper.getCartRoute());
+              } else {
+                showCustomSnackBar('please_select_address_first'.tr,);
+              }
+            }),
             const SizedBox(width: 20),
 
             GetBuilder<AuthController>(builder: (authController) {
@@ -277,7 +329,6 @@ class WebMenuBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => const Size(Dimensions.webMaxWidth, 100);
 
 }

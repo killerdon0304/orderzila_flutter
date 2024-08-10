@@ -1,6 +1,7 @@
 import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/rating_bar.dart';
 import 'package:sixam_mart/common/widgets/readmore_widget.dart';
+import 'package:sixam_mart/features/item/controllers/item_controller.dart';
 import 'package:sixam_mart/features/review/domain/models/review_model.dart';
 import 'package:sixam_mart/helper/date_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
@@ -52,53 +53,63 @@ class ReviewWidget extends StatelessWidget {
         ),
         SizedBox(width: isDesktop ? Dimensions.paddingSizeLarge : 0),
 
-        isDesktop ? Column(children: [
+        isDesktop ? InkWell(
+          onTap: () {
+            Get.find<ItemController>().navigateToItemPage(review.item, context);
+          },
+          child: Column(children: [
 
-          Container(
-            height: 90, width: 120,
+            Container(
+              height: 90, width: 120,
+              padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                border: Border.all(color: Theme.of(context).hintColor.withOpacity(0.2)),
+              ),
+              child:  ClipRRect(
+                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                child: CustomImage(
+                  image: review.itemImageFullUrl ?? '',
+                  height: 45, width: 45, fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(height: Dimensions.paddingSizeDefault),
+
+            Container(width: 120, alignment: Alignment.center, child: Text(review.itemName ?? '', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor), overflow: TextOverflow.ellipsis, maxLines: 1)),
+
+          ]),
+        ) : InkWell(
+          onTap: () {
+            Get.find<ItemController>().navigateToItemPage(review.item, context);
+          },
+          child: Container(
             padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
               border: Border.all(color: Theme.of(context).hintColor.withOpacity(0.2)),
             ),
-            child:  ClipRRect(
-              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-              child: CustomImage(
-                image: review.itemImageFullUrl ?? '',
-                height: 45, width: 45, fit: BoxFit.cover,
+            child: Row(children: [
+
+              const SizedBox(width: Dimensions.paddingSizeExtraSmall),
+              SizedBox(
+                width: 70,
+                child: Text(review.itemName ?? '', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), overflow: TextOverflow.ellipsis, maxLines: 1),
               ),
-            ),
-          ),
-          const SizedBox(height: Dimensions.paddingSizeDefault),
+              const SizedBox(width: Dimensions.paddingSizeSmall),
 
-          Container(width: 120, alignment: Alignment.center, child: Text(review.itemName ?? '', style: robotoRegular.copyWith(color: Theme.of(context).disabledColor), overflow: TextOverflow.ellipsis, maxLines: 1)),
-
-        ]) : Container(
-          padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-          decoration: BoxDecoration(
-            color: Theme.of(context).cardColor,
-            borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-            border: Border.all(color: Theme.of(context).hintColor.withOpacity(0.2)),
-          ),
-          child: Row(children: [
-
-            const SizedBox(width: Dimensions.paddingSizeExtraSmall),
-            SizedBox(
-              width: 70,
-              child: Text(review.itemName ?? '', style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall), overflow: TextOverflow.ellipsis, maxLines: 1),
-            ),
-            const SizedBox(width: Dimensions.paddingSizeSmall),
-
-            ClipRRect(
-              borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
-              child: CustomImage(
-                image: review.itemImageFullUrl ?? '',
-                height: 45, width: 45, fit: BoxFit.cover,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                child: CustomImage(
+                  image: review.itemImageFullUrl ?? '',
+                  height: 45, width: 45, fit: BoxFit.cover,
+                ),
               ),
-            ),
 
-          ]),
+            ]),
+          ),
         ),
 
       ]),

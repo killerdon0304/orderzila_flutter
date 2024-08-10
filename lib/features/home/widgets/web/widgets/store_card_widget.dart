@@ -74,7 +74,7 @@ class StoreCardWidget extends StatelessWidget {
                   DiscountTag(
                     discount: discount, discountType: discountType,
                   ),
-                  isAvailable ? const SizedBox() : NotAvailableWidget(isStore: true, fontSize: Dimensions.fontSizeExtraSmall, isAllSideRound: false),
+                  isAvailable ? const SizedBox() : NotAvailableWidget(isStore: true, store: store, fontSize: Dimensions.fontSizeExtraSmall, isAllSideRound: false),
                   Positioned(
                     top: Dimensions.paddingSizeSmall, right: Dimensions.paddingSizeSmall,
                     child: GetBuilder<FavouriteController>(builder: (favouriteController) {
@@ -83,7 +83,7 @@ class StoreCardWidget extends StatelessWidget {
                         onTap: () {
                           if(AuthHelper.isLoggedIn()) {
                             isWished ? favouriteController.removeFromFavouriteList(store!.id, true)
-                                : favouriteController.addToFavouriteList(null, store!, true);
+                                : favouriteController.addToFavouriteList(null, store?.id, true);
                           }else {
                             showCustomSnackBar('you_are_not_logged_in'.tr);
                           }
@@ -96,7 +96,7 @@ class StoreCardWidget extends StatelessWidget {
                     }),
                   ),
 
-                  Positioned(
+                  store!.ratingCount! > 0 ? Positioned(
                     bottom: -15,
                     left: Get.find<LocalizationController>().isLtr ? null : 10,
                     right: Get.find<LocalizationController>().isLtr ? 10 : null,
@@ -123,7 +123,7 @@ class StoreCardWidget extends StatelessWidget {
                         ),
                       ]),
                     ),
-                  ),
+                  ) : const SizedBox(),
                 ]),
 
                 Expanded(

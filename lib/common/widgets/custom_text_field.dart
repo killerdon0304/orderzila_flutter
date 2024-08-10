@@ -1,5 +1,7 @@
 import 'package:country_code_picker/country_code_picker.dart';
+import 'package:get/get.dart';
 import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -170,6 +172,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                   onChanged: widget.onCountryChanged,
                   initialSelection: widget.countryDialCode,
                   favorite: [widget.countryDialCode!],
+                  enabled: Get.find<SplashController>().configModel?.countryPickerStatus,
                   textStyle: robotoRegular.copyWith(
                     fontSize: Dimensions.fontSizeDefault, color: Theme.of(context).textTheme.bodyMedium!.color,
                   ),

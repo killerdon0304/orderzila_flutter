@@ -78,6 +78,7 @@ class ConfigModel {
   int? subscriptionBusinessModel;
   int? commissionBusinessModel;
   String? subscriptionFreeTrialType;
+  bool? countryPickerStatus;
 
   ConfigModel({
     this.businessName,
@@ -155,6 +156,7 @@ class ConfigModel {
     this.subscriptionBusinessModel,
     this.commissionBusinessModel,
     this.subscriptionFreeTrialType,
+    this.countryPickerStatus,
   });
 
   ConfigModel.fromJson(Map<String, dynamic> json) {
@@ -259,6 +261,7 @@ class ConfigModel {
     subscriptionBusinessModel = json['subscription_business_model'];
     commissionBusinessModel = json['commission_business_model'];
     subscriptionFreeTrialType = json['subscription_free_trial_type'];
+    countryPickerStatus = json['country_picker_status'] == 1;
   }
 
   Map<String, dynamic> toJson() {
@@ -357,6 +360,7 @@ class ConfigModel {
     data['subscription_business_model'] = subscriptionBusinessModel;
     data['commission_business_model'] = commissionBusinessModel;
     data['subscription_free_trial_type'] = subscriptionFreeTrialType;
+    data['country_picker_status'] = countryPickerStatus;
     return data;
   }
 }

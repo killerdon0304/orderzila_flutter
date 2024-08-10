@@ -4,6 +4,15 @@ enum NotificationType{
   general,
   // ignore: constant_identifier_names
   referral_code,
+  otp,
+  // ignore: constant_identifier_names
+  add_fund,
+  block,
+  unblock,
+  //ignore: constant_identifier_names
+  referral_earn,
+  //ignore: constant_identifier_names
+  cashback,
 }
 
 class NotificationBodyModel {
@@ -73,6 +82,18 @@ class NotificationBodyModel {
       return NotificationType.message;
     } else if(enumString == NotificationType.referral_code.toString()) {
       return NotificationType.referral_code;
+    }else if(enumString == NotificationType.otp.toString()) {
+      return NotificationType.otp;
+    }else if(enumString == NotificationType.add_fund.toString()) {
+      return NotificationType.add_fund;
+    }else if(enumString == NotificationType.block.toString()) {
+      return NotificationType.block;
+    }else if(enumString == NotificationType.unblock.toString()) {
+      return NotificationType.unblock;
+    }else if(enumString == NotificationType.referral_earn.toString()) {
+      return NotificationType.referral_earn;
+    }else if(enumString == NotificationType.cashback.toString()) {
+      return NotificationType.cashback;
     }
     return NotificationType.general;
   }

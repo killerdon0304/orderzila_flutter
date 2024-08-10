@@ -23,8 +23,9 @@ class PaymentScreen extends StatefulWidget {
   final String contactNumber;
   final String? subscriptionUrl;
   final int? storeId;
+  final bool? createAccount;
   const PaymentScreen({super.key, required this.orderModel, required this.isCashOnDelivery, this.addFundUrl, required this.paymentMethod,
-    required this.guestId, required this.contactNumber, this.storeId, this.subscriptionUrl});
+    required this.guestId, required this.contactNumber, this.storeId, this.subscriptionUrl, this.createAccount = false});
 
   @override
   PaymentScreenState createState() => PaymentScreenState();
@@ -75,7 +76,8 @@ class PaymentScreenState extends State<PaymentScreen> {
       orderAmount: widget.orderModel.orderAmount, maxCodOrderAmount: _maximumCodOrderAmount,
       isCashOnDelivery: widget.isCashOnDelivery, addFundUrl: widget.addFundUrl,
       contactNumber: widget.contactNumber, storeId: widget.storeId,
-      subscriptionUrl: widget.subscriptionUrl,
+      subscriptionUrl: widget.subscriptionUrl, createAccount: widget.createAccount!,
+      guestId: widget.guestId,
     );
 
     if(!GetPlatform.isIOS) {
@@ -121,7 +123,11 @@ class PaymentScreenState extends State<PaymentScreen> {
 
   Future<bool?> _exitApp() async {
     if((widget.addFundUrl == null || widget.addFundUrl!.isEmpty) && (widget.subscriptionUrl == '' && widget.subscriptionUrl!.isEmpty)){
-      return Get.dialog(PaymentFailedDialog(orderID: widget.orderModel.id.toString(), orderAmount: widget.orderModel.orderAmount, maxCodOrderAmount: _maximumCodOrderAmount, orderType: widget.orderModel.orderType, isCashOnDelivery: widget.isCashOnDelivery));
+      return Get.dialog(PaymentFailedDialog(
+        orderID: widget.orderModel.id.toString(), orderAmount: widget.orderModel.orderAmount,
+        maxCodOrderAmount: _maximumCodOrderAmount, orderType: widget.orderModel.orderType,
+        isCashOnDelivery: widget.isCashOnDelivery, guestId: widget.guestId,
+      ));
     } else{
       return Get.dialog(FundPaymentDialogWidget(isSubscription: widget.subscriptionUrl != null && widget.subscriptionUrl!.isNotEmpty));
     }
@@ -139,12 +145,15 @@ class MyInAppBrowser extends InAppBrowser {
   final String? subscriptionUrl;
   final String? contactNumber;
   final int? storeId;
+  final bool createAccount;
+  final String guestId;
 
   MyInAppBrowser({
     super.windowId, super.initialUserScripts,
     required this.orderID, required this.orderType, required this.orderAmount,
     required this.maxCodOrderAmount, required this.isCashOnDelivery,
-    this.addFundUrl, this.subscriptionUrl, this.contactNumber, this.storeId});
+    this.addFundUrl, this.subscriptionUrl, this.contactNumber, this.storeId,
+    required this.createAccount, required this.guestId});
 
   final bool _canRedirect = true;
 
@@ -163,7 +172,7 @@ class MyInAppBrowser extends InAppBrowser {
     Get.find<OrderController>().paymentRedirect(
       url: url.toString(), canRedirect: _canRedirect, onClose: () => close(),
       addFundUrl: addFundUrl, orderID: orderID, contactNumber: contactNumber, storeId: storeId,
-      subscriptionUrl: subscriptionUrl,
+      subscriptionUrl: subscriptionUrl, createAccount: createAccount, guestId: guestId,
     );
 
   }
@@ -178,7 +187,7 @@ class MyInAppBrowser extends InAppBrowser {
     Get.find<OrderController>().paymentRedirect(
       url: url.toString(), canRedirect: _canRedirect, onClose: () => close(),
       addFundUrl: addFundUrl, orderID: orderID, contactNumber: contactNumber, storeId: storeId,
-      subscriptionUrl: subscriptionUrl,
+      subscriptionUrl: subscriptionUrl, createAccount: createAccount, guestId: guestId,
     );
   }
 

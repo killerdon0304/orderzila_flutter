@@ -1,3 +1,4 @@
+import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/features/address/controllers/address_controller.dart';
 import 'package:sixam_mart/features/address/widgets/address_confirmation_dialogue.dart';
 import 'package:sixam_mart/common/widgets/address_widget.dart';
@@ -76,6 +77,7 @@ class _AddressScreenState extends State<AddressScreen> {
                   children: [
                     WebScreenTitleWidget(title: 'address'.tr),
                     Center(child: FooterView(
+                      minHeight: 0.45,
                       child: SizedBox(
                         width: Dimensions.webMaxWidth,
                         child: Column(
@@ -94,19 +96,20 @@ class _AddressScreenState extends State<AddressScreen> {
                                 ),
                                 physics: const NeverScrollableScrollPhysics(),
                                 shrinkWrap: true,
-                                itemCount: ResponsiveHelper.isDesktop(context) ? (addressController.addressList!.length + 1)  : addressController.addressList!.length ,
+                                itemCount: ResponsiveHelper.isDesktop(context) ? (addressController.addressList!.length + 1) : addressController.addressList!.length ,
                                 itemBuilder: (context, index) {
                                   return (ResponsiveHelper.isDesktop(context) && (index == addressController.addressList!.length)) ?
-                                  InkWell(
-                                    onTap: () => Get.toNamed(RouteHelper.getAddAddressRoute(false, false, 0)),
-                                    child: Container(
-                                        margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                                  Container(
+                                      margin: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                                      decoration:  BoxDecoration(
+                                        color: Theme.of(context).cardColor,
+                                        borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
+                                        boxShadow: [BoxShadow(color: Theme.of(context).primaryColor.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)],
+                                      ),
+                                      child: CustomInkWell(
+                                        onTap: () => Get.toNamed(RouteHelper.getAddAddressRoute(false, false, 0)),
                                         padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                                        decoration:  BoxDecoration(
-                                          color: Theme.of(context).cardColor,
-                                          borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
-                                          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
-                                        ),
+                                        radius: Dimensions.radiusDefault,
                                         child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
@@ -114,8 +117,8 @@ class _AddressScreenState extends State<AddressScreen> {
                                             const SizedBox(height: Dimensions.paddingSizeSmall),
                                             Text('add_new_address'.tr, style: robotoRegular.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall)),
                                           ],
-                                        )
-                                    ),
+                                        ),
+                                      )
                                   ) :
                                   AddressWidget(
                                     address: addressController.addressList![index], fromAddress: true,

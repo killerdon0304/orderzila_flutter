@@ -94,7 +94,7 @@ class WalletHistoryWidget extends StatelessWidget {
             ),
             physics:  const NeverScrollableScrollPhysics(),
             shrinkWrap:  true,
-            itemCount: walletController.transactionList!.length ,
+            itemCount: walletController.transactionList!.length,
             padding: EdgeInsets.only(top: ResponsiveHelper.isDesktop(context) ? 28 : 25),
             itemBuilder: (context, index) {
               return HistoryItemWidget(index: index, fromWallet: true, data: walletController.transactionList);

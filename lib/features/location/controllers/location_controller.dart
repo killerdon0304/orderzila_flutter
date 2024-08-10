@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
+import 'package:sixam_mart/features/location/screens/pick_map_screen.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
@@ -232,6 +234,7 @@ class LocationController extends GetxController implements GetxService {
   }
 
   void _prepareZoneData(AddressModel address, bool fromSignUp, String? route, bool canRoute, bool isDesktop) {
+    print('=====here====1====> $route');
     getZone(address.latitude, address.longitude, false).then((response) async {
       if (response.isSuccess) {
         Get.find<CartController>().getCartDataOnline();
@@ -246,12 +249,15 @@ class LocationController extends GetxController implements GetxService {
       } else {
         Get.back();
         showCustomSnackBar(response.message);
+        if(route == 'splash') {
+          Get.toNamed(RouteHelper.getPickMapRoute(route, false));
+        }
       }
     });
   }
 
   void autoNavigate(AddressModel? address, bool fromSignUp, String? route, bool canRoute, bool isDesktop) async {
-    if (isDesktop && Get.find<SplashController>().configModel!.module == null) {
+    if (isDesktop && Get.find<SplashController>().module == null/* && Get.find<SplashController>().configModel!.module == null*/) {
       List<int>? zoneIds = address!.zoneIds;
       Map<String, String> header = locationServiceInterface.prepareHeader(zoneIds);
       await Get.find<SplashController>().getModules(headers: header);
@@ -268,6 +274,7 @@ class LocationController extends GetxController implements GetxService {
 
   void _saveDataAndFirebaseConfig(AddressModel address, bool fromSignUp, String? route, bool canRoute, bool isDesktop) async {
     locationServiceInterface.configureFirebaseMessaging(address);
+    print('=====here====2====> $route');
     await AddressHelper.saveUserAddressInSharedPref(address);
     if(AuthHelper.isLoggedIn()) {
       if(Get.find<SplashController>().module != null) {
@@ -282,7 +289,7 @@ class LocationController extends GetxController implements GetxService {
 
     if(ResponsiveHelper.isDesktop(Get.context) && AuthHelper.isLoggedIn() && Get.find<SplashController>().module != null) {
       if(Get.find<ProfileController>().userInfoModel == null) {
-        Get.dialog(const CustomLoader(), barrierDismissible: false);
+        Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
         await Get.find<ProfileController>().getUserInfo();
         Get.back();
       }
@@ -369,15 +376,76 @@ class LocationController extends GetxController implements GetxService {
     bool fromHome = page == 'home';
 
     if(!fromHome && AddressHelper.getUserAddressFromSharedPref() != null) {
-      Get.dialog(const CustomLoader(), barrierDismissible: false);
+      Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
       autoNavigate(AddressHelper.getUserAddressFromSharedPref(), fromSignup, null, false, ResponsiveHelper.isDesktop(Get.context));
     }else if(AuthHelper.isLoggedIn()) {
-      Get.dialog(const CustomLoader(), barrierDismissible: false);
+      Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
       await Get.find<AddressController>().getAddressList();
       Get.back();
       locationServiceInterface.authorizeNavigation(page, Get.find<AddressController>().addressList, mapController, offNamed: offNamed, offAll: offAll);
     }else {
-      locationServiceInterface.defaultNavigation(page, mapController);
+      // locationServiceInterface.defaultNavigation(page, mapController);
+      if(ResponsiveHelper.isDesktop(Get.context)) {
+        showGeneralDialog(context: Get.context!, pageBuilder: (_,__,___) {
+          return SizedBox(
+            height: Get.context!.height * 0.75, width: 300,
+            child: PickMapScreen(
+              fromSignUp: (page == RouteHelper.signUp),
+              canRoute: false, fromAddAddress: false, route: null,
+              googleMapController: mapController,
+            ),
+          );
+        });
+      } else {
+        _checkPermission(page);
+      }
+    }
+  }
+
+  void _checkPermission(String page) async {
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if(permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if(permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      Get.toNamed(RouteHelper.getPickMapRoute(page, false));
+    } else {
+      if(page == 'home'){
+        Get.toNamed(RouteHelper.getPickMapRoute(page, false));
+      } else if(await _locationCheck()) {
+        Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
+        await Get.find<LocationController>().getCurrentLocation(false).then((value) {
+          if (value.latitude != null) {
+            _onPickAddressButtonPressed(Get.find<LocationController>(), page);
+          }
+        });
+      } else {
+        Get.toNamed(RouteHelper.getPickMapRoute(page, false));
+      }
+    }
+  }
+
+  Future<bool> _locationCheck() async {
+    Location location = Location();
+    bool serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+    }
+    return serviceEnabled;
+  }
+
+  void _onPickAddressButtonPressed(LocationController locationController, String page) {
+    if(locationController.pickPosition.latitude != 0 && locationController.pickAddress!.isNotEmpty) {
+      AddressModel address = AddressModel(
+        latitude: locationController.pickPosition.latitude.toString(),
+        longitude: locationController.pickPosition.longitude.toString(),
+        addressType: 'others', address: locationController.pickAddress,
+      );
+      locationController.saveAddressAndNavigate(address, false, page, false, ResponsiveHelper.isDesktop(Get.context));
+    } else {
+      showCustomSnackBar('pick_an_address'.tr);
     }
   }
 

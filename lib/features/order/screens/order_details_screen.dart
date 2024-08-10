@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:photo_view/photo_view.dart';
+import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/order/controllers/order_controller.dart';
 import 'package:sixam_mart/features/order/domain/models/order_details_model.dart';
@@ -58,8 +59,8 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   void _startApiCall(){
     _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
-      Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: widget.contactNumber);
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) async {
+      await Get.find<OrderController>().timerTrackOrder(widget.orderId.toString(), contactNumber: widget.contactNumber);
     });
   }
 
@@ -74,9 +75,9 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
   @override
   void dispose() {
-    super.dispose();
-
     _timer?.cancel();
+
+    super.dispose();
   }
 
   @override
@@ -276,8 +277,9 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 margin: ResponsiveHelper.isDesktop(context) ? null : const EdgeInsets.all(Dimensions.paddingSizeSmall),
                 onPressed: () async{
                   _timer?.cancel();
-                  await Get.toNamed(RouteHelper.getOrderTrackingRoute(order.id, widget.contactNumber));
-                  _startApiCall();
+                  await Get.toNamed(RouteHelper.getOrderTrackingRoute(order.id, widget.contactNumber))?.whenComplete(() {
+                    _startApiCall();
+                  });
                 },
               ),
             ) : const SizedBox(),
@@ -308,7 +310,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
 
             order.orderStatus == 'pending' ? const SizedBox(width: Dimensions.paddingSizeSmall) : const SizedBox(),
 
-            order.orderStatus == 'pending' ? Expanded(child: Padding(
+            (order.orderStatus == 'pending' && (Get.find<AuthController>().isLoggedIn() ? true : (orderController.orderDetails != null && orderController.orderDetails!.isNotEmpty  && orderController.orderDetails?[0].isGuest == 1 ? true : false))) ? Expanded(child: Padding(
               padding: ResponsiveHelper.isDesktop(context) ? EdgeInsets.zero : const EdgeInsets.all(Dimensions.paddingSizeSmall),
               child: TextButton(
                 style: TextButton.styleFrom(minimumSize: const Size(1, 50), shape: RoundedRectangleBorder(
@@ -316,7 +318,7 @@ class OrderDetailsScreenState extends State<OrderDetailsScreen> {
                 )),
                 onPressed: () {
                   orderController.setOrderCancelReason('');
-                  Get.dialog(CancellationDialogueWidget(orderId: order.id));
+                  Get.dialog(CancellationDialogueWidget(orderId: order.id, contactNumber: widget.contactNumber));
                 },
                 child: Text(parcel ? 'cancel_delivery'.tr : 'cancel_order'.tr, style: robotoBold.copyWith(
                   color: Theme.of(context).disabledColor, fontSize: Dimensions.fontSizeLarge,

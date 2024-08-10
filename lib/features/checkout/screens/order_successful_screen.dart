@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:sixam_mart/features/auth/screens/sign_in_screen.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
@@ -22,7 +23,9 @@ import 'package:get/get.dart';
 class OrderSuccessfulScreen extends StatefulWidget {
   final String? orderID;
   final String? contactPersonNumber;
-  const OrderSuccessfulScreen({super.key, required this.orderID, this.contactPersonNumber});
+  final bool? createAccount;
+  final String guestId;
+  const OrderSuccessfulScreen({super.key, required this.orderID, this.contactPersonNumber, this.createAccount = false, required this.guestId});
 
   @override
   State<OrderSuccessfulScreen> createState() => _OrderSuccessfulScreenState();
@@ -41,7 +44,7 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
     if(widget.orderID != null) {
       if(widget.orderID!.contains('?')){
         var parts = widget.orderID!.split('?');
-        String id = parts[0].trim();                 // prefix: "date"
+        String id = parts[0].trim();
         orderId = id;
       }
     }
@@ -83,7 +86,10 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
 
             if (!success && !Get.isDialogOpen! && orderController.trackModel!.orderStatus != 'canceled' && Get.currentRoute.startsWith(RouteHelper.orderSuccess)) {
               Future.delayed(const Duration(seconds: 1), () {
-                Get.dialog(PaymentFailedDialog(orderID: orderId, isCashOnDelivery: _isCashOnDeliveryActive, orderAmount: total, maxCodOrderAmount: maximumCodOrderAmount, orderType: parcel ? 'parcel' : 'delivery'), barrierDismissible: false);
+                Get.dialog(PaymentFailedDialog(
+                  orderID: orderId, isCashOnDelivery: _isCashOnDeliveryActive, orderAmount: total, maxCodOrderAmount: maximumCodOrderAmount,
+                  orderType: parcel ? 'parcel' : 'delivery', guestId: widget.guestId,
+                ), barrierDismissible: false);
               });
             }
           }
@@ -101,6 +107,29 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                   style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeLarge),
                 ),
                 const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                widget.createAccount! ? Padding(
+                  padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
+                  child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    Text(
+                      'and_create_account_successfully'.tr,
+                      style: robotoMedium,
+                    ),
+                    InkWell(
+                      onTap: () {
+                        if(ResponsiveHelper.isDesktop(context)){
+                          Get.dialog(const SignInScreen(exitFromApp: false, backFromThis: false));
+                        }else{
+                          Get.toNamed(RouteHelper.getSignInRoute(RouteHelper.splash));
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                        child: Text('sign_in'.tr, style: robotoMedium.copyWith(color: Theme.of(context).primaryColor)),
+                      ),
+                    ),
+                  ]),
+                ) : const SizedBox(),
 
                 AuthHelper.isGuestLoggedIn() ? SelectableText(
                   '${'order_id'.tr}: $orderId',
@@ -141,7 +170,9 @@ class _OrderSuccessfulScreenState extends State<OrderSuccessfulScreen> {
                   child: CustomButton(
                   width: ResponsiveHelper.isDesktop(context) ? 300 : double.infinity,
                   buttonText: 'back_to_home'.tr, onPressed: () {
-                    Get.find<AuthController>().saveEarningPoint(total.toStringAsFixed(0));
+                    if(AuthHelper.isLoggedIn()) {
+                      Get.find<AuthController>().saveEarningPoint(total.toStringAsFixed(0));
+                    }
                     Get.offAllNamed(RouteHelper.getInitialRoute());
                   }),
                 ),

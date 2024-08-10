@@ -61,6 +61,13 @@ class CartController extends GetxController implements GetxService {
   bool _isExpanded = true;
   bool get isExpanded => _isExpanded;
 
+  int? _directAddCartItemIndex = -1;
+  int? get directAddCartItemIndex => _directAddCartItemIndex;
+
+  void setDirectlyAddToCartIndex(int? index) {
+    _directAddCartItemIndex = index;
+  }
+
   void toggleExtraPackage({bool willUpdate = true}) {
     _needExtraPackage = !_needExtraPackage;
     if(willUpdate) {
@@ -144,7 +151,7 @@ class CartController extends GetxController implements GetxService {
     }else {
       _cartList.add(cartModel);
     }
-    Get.find<ItemController>().setExistInCart(cartModel.item, notify: true);
+    Get.find<ItemController>().setExistInCart(cartModel.item, null, notify: true);
     await cartServiceInterface.addSharedPrefCartList(_cartList);
 
     calculationCart();
@@ -159,11 +166,11 @@ class CartController extends GetxController implements GetxService {
     _isLoading = true;
     update();
 
-    _cartList[cartIndex].quantity = cartServiceInterface.decideItemQuantity(isIncrement, _cartList, cartIndex, stock, quantityLimit, Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!);
+    _cartList[cartIndex].quantity = await cartServiceInterface.decideItemQuantity(isIncrement, _cartList, cartIndex, stock, quantityLimit, Get.find<SplashController>().configModel!.moduleConfig!.module!.stock!);
 
-    double discountedPrice = cartServiceInterface.calculateDiscountedPrice(_cartList[cartIndex], _cartList[cartIndex].quantity!, ModuleHelper.getModuleConfig(_cartList[cartIndex].item!.moduleType).newVariation!);
+    double discountedPrice = await cartServiceInterface.calculateDiscountedPrice(_cartList[cartIndex], _cartList[cartIndex].quantity!, ModuleHelper.getModuleConfig(_cartList[cartIndex].item!.moduleType).newVariation!);
     if(ModuleHelper.getModuleConfig(_cartList[cartIndex].item!.moduleType).newVariation!) {
-      Get.find<ItemController>().setExistInCart(_cartList[cartIndex].item, notify: true);
+     await Get.find<ItemController>().setExistInCart(_cartList[cartIndex].item, null, notify: true);
     }
 
     await updateCartQuantityOnline(_cartList[cartIndex].id!, discountedPrice, _cartList[cartIndex].quantity!);
@@ -243,8 +250,9 @@ class CartController extends GetxController implements GetxService {
     update();
     bool success = await cartServiceInterface.updateCartQuantityOnline(cartId, price, quantity);
     if(success) {
-      getCartDataOnline();
+      await getCartDataOnline();
       calculationCart();
+      await Future.delayed(const Duration(milliseconds: 200));
     }
     _isLoading = false;
     update();
@@ -271,7 +279,7 @@ class CartController extends GetxController implements GetxService {
     if(success) {
       await getCartDataOnline();
       if(item != null) {
-        Get.find<ItemController>().setExistInCart(item, notify: true);
+        Get.find<ItemController>().setExistInCart(item, null, notify: true);
       }
     }
     _isLoading = false;

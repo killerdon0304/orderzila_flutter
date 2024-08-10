@@ -134,16 +134,6 @@ class _NewPassScreenState extends State<NewPassScreen> {
                 Get.dialog(const SignInScreen(exitFromApp: true, backFromThis: true));
               });
             }
-            // Get.find<AuthController>().login('+${widget.number!.trim()}', password).then((value) async {
-            //   Get.offAllNamed(RouteHelper.getSignInRoute('reset-password'));
-            //   if(!ResponsiveHelper.isDesktop(context)) {
-            //     Get.offAllNamed(RouteHelper.getSignInRoute(Get.currentRoute));
-            //   }else{
-            //     Get.offAllNamed(RouteHelper.getInitialRoute(fromSplash: false))?.then((value) {
-            //       Get.dialog(const SignInScreen(exitFromApp: true, backFromThis: true));
-            //     });
-            //   }
-            // });
           } else {
             showCustomSnackBar(value.message);
           }

@@ -7,6 +7,7 @@ class Images {
   static const String call = 'assets/image/call.png';
   static const String checked = 'assets/image/checked.png';
   static const String english = 'assets/image/english.png';
+  static const String spanish = 'assets/image/spanish.png';
   static const String locationMarker = 'assets/image/location_marker.png';
   static const String lock = 'assets/image/lock.png';
   static const String mail = 'assets/image/mail.png';
@@ -271,6 +272,8 @@ class Images {
   static const String shoppingCart = 'assets/image/shopping_cart.png';
   static const String addressUnselect = 'assets/image/address_unselect.png';
   static const String addressSelect = 'assets/image/address_select.png';
+  static const String highlightIcon = 'assets/image/highlight_icon.png';
+  static const String languageBackground = 'assets/image/language_bg.png';
 
 
   static const String referBg = 'assets/image/refer_bg.svg';
@@ -282,5 +285,10 @@ class Images {
   static const String storeRegistrationSuccess = 'assets/image/store_registration_success.svg';
   static const String checkGif = 'assets/image/check.gif';
   static const String cancelGif = 'assets/image/cancel.gif';
+  static const String highlightBg = 'assets/image/highlight_bg.svg';
+  static const String highlightDarkBg = 'assets/image/highlight_dark_bg.svg';
+  static const String favouriteIcon = 'assets/image/favourite_icon.svg';
+  static const String unFavouriteIcon = 'assets/image/unfavourite_icon.svg';
+  static const String languageBg = 'assets/image/language_bg.svg';
 
 }

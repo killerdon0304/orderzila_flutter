@@ -1,12 +1,16 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/location/controllers/location_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/order/domain/models/order_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
+import 'package:sixam_mart/helper/marker_helper.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -53,7 +57,7 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget> {
       padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
       ),
       child: widget.track!.deliveryMan != null ? Stack(
@@ -81,6 +85,14 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget> {
                   ) : widget.track!.deliveryAddress, widget.track!.orderType == 'take_away', widget.track!.orderType == 'parcel', widget.track!.moduleType == 'food',
                 );
               },
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(() => EagerGestureRecognizer()),
+                Factory<PanGestureRecognizer>(() => PanGestureRecognizer()),
+                Factory<ScaleGestureRecognizer>(() => ScaleGestureRecognizer()),
+                Factory<TapGestureRecognizer>(() => TapGestureRecognizer()),
+                Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer()),
+              },
+              style: Get.isDarkMode ? Get.find<ThemeController>().darkMap : Get.find<ThemeController>().lightMap,
             ),
           ),
 
@@ -92,12 +104,14 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget> {
 
   void setMarker(Store? store, DeliveryMan? deliveryMan, AddressModel? addressModel, bool takeAway, bool parcel, bool isRestaurant) async {
     try {
-      Uint8List restaurantImageData = await convertAssetToUnit8List(parcel ? Images.userMarker
-          : isRestaurant ? Images.restaurantMarker : Images.markerStore, width: isRestaurant ? 100 : 150);
-      Uint8List deliveryBoyImageData = await convertAssetToUnit8List(Images.deliveryManMarker, width: 100);
-      Uint8List destinationImageData = await convertAssetToUnit8List(
-        takeAway ? Images.myLocationMarker : Images.userMarker,
-        width: takeAway ? 50 : 100,
+      BitmapDescriptor restaurantImageData = await MarkerHelper.convertAssetToBitmapDescriptor(
+        width: isRestaurant ? 100 : 150, imagePath: parcel ? Images.userMarker : isRestaurant ? Images.restaurantMarker : Images.markerStore,
+      );
+      BitmapDescriptor deliveryBoyImageData = await MarkerHelper.convertAssetToBitmapDescriptor(
+        width: 100, imagePath: Images.deliveryManMarker,
+      );
+      BitmapDescriptor destinationImageData = await MarkerHelper.convertAssetToBitmapDescriptor(
+        width: takeAway ? 50 : 100, imagePath: takeAway ? Images.myLocationMarker : Images.userMarker,
       );
 
       /// Animate to coordinate
@@ -137,7 +151,7 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget> {
           title: parcel ? 'Sender' : 'Destination',
           snippet: addressModel.address,
         ),
-        icon: GetPlatform.isWeb ? BitmapDescriptor.defaultMarker : BitmapDescriptor.bytes(destinationImageData),
+        icon: destinationImageData,
       )) : const SizedBox();
 
       ///store for normal order , but receiver for parcel order
@@ -148,7 +162,7 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget> {
           title: parcel ? 'Receiver' : Get.find<SplashController>().configModel!.moduleConfig!.module!.showRestaurantText! ? 'store'.tr : 'store'.tr,
           snippet: store.address,
         ),
-        icon: GetPlatform.isWeb ? BitmapDescriptor.defaultMarker : BitmapDescriptor.bytes(restaurantImageData),
+        icon: restaurantImageData,
       )) : const SizedBox();
 
       deliveryMan != null ? _markers.add(Marker(
@@ -159,7 +173,7 @@ class _TrackingMapWidgetState extends State<TrackingMapWidget> {
           snippet: deliveryMan.location,
         ),
         rotation: rotation,
-        icon: GetPlatform.isWeb ? BitmapDescriptor.defaultMarker : BitmapDescriptor.bytes(deliveryBoyImageData),
+        icon: deliveryBoyImageData,
       )) : const SizedBox();
 
     }catch(_) {}

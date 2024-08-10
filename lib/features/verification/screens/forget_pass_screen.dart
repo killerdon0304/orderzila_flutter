@@ -33,7 +33,7 @@ class ForgetPassScreen extends StatefulWidget {
 class _ForgetPassScreenState extends State<ForgetPassScreen> {
   final TextEditingController _numberController = TextEditingController();
   String? _countryDialCode = CountryCode.fromCountryCode(Get.find<SplashController>().configModel!.country!).dialCode;
-  GlobalKey<FormState>? _formKeyPhone = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKeyPhone = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +114,7 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
     PhoneValid phoneValid = await CustomValidator.isPhoneValid(numberWithCountryCode);
     numberWithCountryCode = phoneValid.phone;
 
-    if(_formKeyPhone!.currentState!.validate()) {
+    if(_formKeyPhone.currentState!.validate()) {
       if (phone.isEmpty) {
         showCustomSnackBar('enter_phone_number'.tr);
       }else if (!phoneValid.isValid) {
@@ -122,6 +122,8 @@ class _ForgetPassScreenState extends State<ForgetPassScreen> {
       }else {
         if(widget.fromSocialLogin) {
           widget.socialLogInBody!.phone = numberWithCountryCode;
+          String? deviceToken = await Get.find<AuthController>().saveDeviceToken();
+          widget.socialLogInBody!.deviceToken = deviceToken;
           Get.find<AuthController>().registerWithSocialMedia(widget.socialLogInBody!);
         }else {
           Get.find<VerificationController>().forgetPassword(numberWithCountryCode).then((status) async {

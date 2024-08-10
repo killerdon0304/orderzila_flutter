@@ -96,7 +96,7 @@ class _AccessLocationScreenState extends State<AccessLocationScreen> {
                         address: locationController.addressList![index],
                         fromAddress: false,
                         onTap: () {
-                          Get.dialog(const CustomLoader(), barrierDismissible: false);
+                          Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
                           AddressModel address = locationController.addressList![index];
                           Get.find<LocationController>().saveAddressAndNavigate(
                             address, widget.fromSignUp, widget.route, widget.route != null, ResponsiveHelper.isDesktop(context),
@@ -153,7 +153,7 @@ class BottomButton extends StatelessWidget {
         buttonText: 'user_current_location'.tr,
         onPressed: () async {
           Get.find<LocationController>().checkPermission(() async {
-            Get.dialog(const CustomLoader(), barrierDismissible: false);
+            Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
             AddressModel address = await Get.find<LocationController>().getCurrentLocation(true);
             ZoneResponseModel response = await Get.find<LocationController>().getZone(address.latitude, address.longitude, false);
             if(response.isSuccess) {

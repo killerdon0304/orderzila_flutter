@@ -49,7 +49,7 @@ class _GuestTrackOrderScreenState extends State<GuestTrackOrderScreen> {
           }
           OrderModel? order = orderController.trackModel;
           return SingleChildScrollView(
-            physics: isDesktop ? const BouncingScrollPhysics() : const NeverScrollableScrollPhysics(),
+            // physics: isDesktop ? const BouncingScrollPhysics() : const NeverScrollableScrollPhysics(),
             child: FooterView(
               child: Container(
                 margin: isDesktop ? EdgeInsets.symmetric(horizontal: (width - 1170) / 2, vertical: 50) : null,
@@ -57,114 +57,111 @@ class _GuestTrackOrderScreenState extends State<GuestTrackOrderScreen> {
                   color: Theme.of(context).canvasColor, borderRadius: BorderRadius.circular(Dimensions.radiusDefault),
                   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 5, spreadRadius: 1)],
                 ) : null,
-                child: SingleChildScrollView(
-                  physics: isDesktop ? const NeverScrollableScrollPhysics() : const BouncingScrollPhysics(),
-                  child: Column(children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                      child: orderController.trackModel != null ? Column(children: [
-                        const SizedBox(height: Dimensions.paddingSizeLarge),
+                child: Column(children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                    child: orderController.trackModel != null ? Column(children: [
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                          Text('your_order'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
+                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        Text('your_order'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge)),
 
-                          Text(' #${orderController.trackModel?.id}', style: robotoMedium.copyWith(
-                            fontSize: Dimensions.fontSizeExtraLarge, color: Theme.of(context).primaryColor,
-                          )),
-                        ]),
-                        const SizedBox(height: Dimensions.paddingSizeLarge),
+                        Text(' #${orderController.trackModel?.id}', style: robotoMedium.copyWith(
+                          fontSize: Dimensions.fontSizeExtraLarge, color: Theme.of(context).primaryColor,
+                        )),
+                      ]),
+                      const SizedBox(height: Dimensions.paddingSizeLarge),
 
-                        Column(children: [
-                          GuestCustomStepperWidget(
-                            title: 'order_placed'.tr,
-                            isComplete: status == AppConstants.pending
-                                || status == AppConstants.confirmed
-                                || status == AppConstants.processing
-                                || status == AppConstants.pickedUp
-                                || status == AppConstants.handover
-                                || status == AppConstants.delivered
-                                || status == AppConstants.accepted,
-                            isActive: status == AppConstants.pending,
-                            haveTopBar: false,
-                            statusImage: Images.trackOrderPlace,
-                            subTitle: DateConverter.dateTimeStringToDateTime(order!.scheduleAt!),
-                          ),
+                      Column(children: [
+                        GuestCustomStepperWidget(
+                          title: 'order_placed'.tr,
+                          isComplete: status == AppConstants.pending
+                              || status == AppConstants.confirmed
+                              || status == AppConstants.processing
+                              || status == AppConstants.pickedUp
+                              || status == AppConstants.handover
+                              || status == AppConstants.delivered
+                              || status == AppConstants.accepted,
+                          isActive: status == AppConstants.pending,
+                          haveTopBar: false,
+                          statusImage: Images.trackOrderPlace,
+                          subTitle: DateConverter.dateTimeStringToDateTime(order!.scheduleAt!),
+                        ),
 
-                          GuestCustomStepperWidget(
-                            title: 'order_accepted'.tr,
-                            isComplete: status == AppConstants.confirmed
-                                || status == AppConstants.processing
-                                || status == AppConstants.pickedUp
-                                || status == AppConstants.handover
-                                || status == AppConstants.delivered
-                                || status == AppConstants.accepted,
-                            isActive: status == AppConstants.confirmed || status == AppConstants.accepted,
-                            statusImage: Images.trackOrderAccept,
-                          ),
+                        GuestCustomStepperWidget(
+                          title: 'order_confirmed'.tr,
+                          isComplete: status == AppConstants.confirmed
+                              || status == AppConstants.processing
+                              || status == AppConstants.pickedUp
+                              || status == AppConstants.handover
+                              || status == AppConstants.delivered
+                              || status == AppConstants.accepted,
+                          isActive: status == AppConstants.confirmed || status == AppConstants.accepted,
+                          statusImage: Images.trackOrderAccept,
+                        ),
 
-                          GuestCustomStepperWidget(
-                            title: 'preparing_item'.tr,
-                            isComplete: status == AppConstants.processing
-                                || status == AppConstants.pickedUp
-                                || status == AppConstants.handover
-                                ||status == AppConstants.delivered,
-                            isActive: status == AppConstants.processing,
-                            statusImage: Images.trackOrderPreparing,
-                          ),
+                        GuestCustomStepperWidget(
+                          title: 'preparing_item'.tr,
+                          isComplete: status == AppConstants.processing
+                              || status == AppConstants.pickedUp
+                              || status == AppConstants.handover
+                              ||status == AppConstants.delivered,
+                          isActive: status == AppConstants.processing,
+                          statusImage: Images.trackOrderPreparing,
+                        ),
 
-                          GuestCustomStepperWidget(
-                            title: 'order_is_on_the_way'.tr,
-                            isComplete: status == AppConstants.handover
-                                || status == AppConstants.pickedUp
-                                || status == AppConstants.delivered,
-                            statusImage: Images.trackOrderOnTheWay,
-                            isActive: status == AppConstants.handover,
-                            subTitle: 'your_delivery_man_is_coming'.tr,
-                            trailing: orderController.trackModel?.deliveryMan?.phone != null ? InkWell(
-                              onTap: () async {
+                        GuestCustomStepperWidget(
+                          title: 'order_is_on_the_way'.tr,
+                          isComplete: status == AppConstants.handover
+                              || status == AppConstants.pickedUp
+                              || status == AppConstants.delivered,
+                          statusImage: Images.trackOrderOnTheWay,
+                          isActive: status == AppConstants.handover,
+                          subTitle: 'your_delivery_man_is_coming'.tr,
+                          trailing: orderController.trackModel?.deliveryMan?.phone != null ? InkWell(
+                            onTap: () async {
 
-                                if(await canLaunchUrlString('tel:${orderController.trackModel?.deliveryMan?.phone}')) {
-                                  launchUrlString('tel:${orderController.trackModel?.deliveryMan?.phone}');
-                                }else {
-                                  showCustomSnackBar('${'can_not_launch'.tr} ${orderController.trackModel?.deliveryMan?.phone}');
-                                }
+                              if(await canLaunchUrlString('tel:${orderController.trackModel?.deliveryMan?.phone}')) {
+                                launchUrlString('tel:${orderController.trackModel?.deliveryMan?.phone}');
+                              }else {
+                                showCustomSnackBar('${'can_not_launch'.tr} ${orderController.trackModel?.deliveryMan?.phone}');
+                              }
 
-                              },
-                              child: const Icon(Icons.phone_in_talk),
-                            ) : const SizedBox(),
-                          ),
+                            },
+                            child: const Icon(Icons.phone_in_talk),
+                          ) : const SizedBox(),
+                        ),
 
-                          GuestCustomStepperWidget(
-                            title: 'order_delivered'.tr,
-                            isComplete: status == AppConstants.delivered,
-                            isActive: status == AppConstants.delivered,
-                            statusImage: Images.trackOrderDelivered,
-                            child: orderController.trackModel?.deliveryMan != null ? TrackingMapWidget(
-                              track: orderController.trackModel,
-                            ) : const SizedBox(),
-                          ),
-                        ]),
-                      ]) : const Center(child: Padding(
-                        padding: EdgeInsets.only(top: 200.0, bottom: 200),
-                        child: CircularProgressIndicator(),
-                      )),
+                        GuestCustomStepperWidget(
+                          title: 'order_delivered'.tr,
+                          isComplete: status == AppConstants.delivered,
+                          isActive: status == AppConstants.delivered,
+                          statusImage: Images.trackOrderDelivered,
+                          child: orderController.trackModel?.deliveryMan != null ? TrackingMapWidget(
+                            track: orderController.trackModel,
+                          ) : const SizedBox(),
+                        ),
+                      ]),
+                    ]) : const Center(child: Padding(
+                      padding: EdgeInsets.only(top: 200.0, bottom: 200),
+                      child: CircularProgressIndicator(),
+                    )),
+                  ),
+
+                  // const SizedBox(height: 50),
+
+                  isDesktop ? Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraLarge),
+                    child: CustomButton(
+                      buttonText: 'view_details'.tr,
+                      width: 300,
+                      onPressed: () {
+                        Get.toNamed(RouteHelper.getOrderDetailsRoute(int.parse(widget.orderId), contactNumber: widget.number),);
+                      },
                     ),
+                  ) : const SizedBox(),
 
-                    // const SizedBox(height: 50),
-
-                    isDesktop ? Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault, vertical: Dimensions.paddingSizeExtraLarge),
-                      child: CustomButton(
-                        buttonText: 'view_details'.tr,
-                        width: 300,
-                        onPressed: () {
-                          Get.toNamed(RouteHelper.getOrderDetailsRoute(int.parse(widget.orderId), contactNumber: widget.number),);
-                        },
-                      ),
-                    ) : const SizedBox(),
-
-                  ]),
-                ),
+                ]),
               ),
             ),
           );

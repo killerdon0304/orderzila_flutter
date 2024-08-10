@@ -9,6 +9,6 @@ abstract class OrderRepositoryInterface extends RepositoryInterface {
   Future getList({int? offset, bool isRunningOrder = false, bool isHistoryOrder = false, bool isCancelReasons = false, bool isRefundReasons = false, bool fromDashboard});
   Future<Response> submitRefundRequest(Map<String, String> body, XFile? data);
   Future<Response> trackOrder(String? orderID, String? guestId, {String? contactNumber});
-  Future<bool> cancelOrder(String orderID, String? reason);
-  Future<Response> switchToCOD(String? orderID);
+  Future<bool> cancelOrder(String orderID, String? reason, {String? guestId});
+  Future<Response> switchToCOD(String? orderID, {String? guestId});
 }

@@ -26,23 +26,25 @@ class FavouriteController extends GetxController implements GetxService {
   bool _isRemoving = false;
   bool get isRemoving => _isRemoving;
 
-  void addToFavouriteList(Item? product, Store? store, bool isStore, {bool getXSnackBar = false}) async {
+  void addToFavouriteList(Item? product, int? storeID, bool isStore, {bool getXSnackBar = false}) async {
+    _isRemoving = true;
+    update();
     if(isStore) {
       _wishStoreList ??= [];
-      _wishStoreIdList.add(store!.id);
-      _wishStoreList!.add(store);
+      _wishStoreIdList.add(storeID);
+      _wishStoreList!.add(Store());
     }else{
       _wishItemList ??= [];
       _wishItemList!.add(product);
       _wishItemIdList.add(product!.id);
     }
-    ResponseModel responseModel = await favouriteServiceInterface.addFavouriteList(isStore ? store!.id : product!.id, isStore);
+    ResponseModel responseModel = await favouriteServiceInterface.addFavouriteList(isStore ? storeID : product!.id, isStore);
     if (responseModel.isSuccess) {
       showCustomSnackBar(responseModel.message, isError: false, getXSnackBar: getXSnackBar);
     } else {
       if(isStore) {
         for (var storeId in _wishStoreIdList) {
-          if (storeId == store!.id) {
+          if (storeId == storeID) {
             _wishStoreIdList.removeAt(_wishStoreIdList.indexOf(storeId));
           }
         }
@@ -55,6 +57,7 @@ class FavouriteController extends GetxController implements GetxService {
       }
       showCustomSnackBar(responseModel.message, isError: true, getXSnackBar: getXSnackBar);
     }
+    _isRemoving = false;
     update();
   }
 

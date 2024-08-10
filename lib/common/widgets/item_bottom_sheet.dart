@@ -27,8 +27,6 @@ import 'package:sixam_mart/features/checkout/screens/checkout_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'cart_snackbar.dart';
-
 class ItemBottomSheet extends StatefulWidget {
   final Item? item;
   final bool isCampaign;
@@ -459,10 +457,11 @@ class _ItemBottomSheetState extends State<ItemBottomSheet> {
                                     List<int?> listOfAddOnQty = _getSelectedAddonQtnList(addOnIdList: addOnIdList);
 
                                     OnlineCart onlineCart = OnlineCart(
-                                      widget.cart?.id, widget.isCampaign ? null : widget.item!.id, widget.isCampaign ? widget.item!.id : null,
+                                      (widget.cart != null || itemController.cartIndex != -1) ? widget.cart?.id ?? cartController.cartList[itemController.cartIndex].id : null,
+                                      widget.isCampaign ? null : widget.item!.id, widget.isCampaign ? widget.item!.id : null,
                                       priceWithDiscountAndAddons.toString(), '', variation != null ? [variation] : null,
                                       Get.find<SplashController>().getModuleConfig(widget.item!.moduleType).newVariation! ? variations : null,
-                                      itemController.quantity, listOfAddOnId, addOnsList, listOfAddOnQty, 'Item'
+                                      itemController.quantity, listOfAddOnId, addOnsList, listOfAddOnQty, 'Item',
                                     );
 
                                     if(widget.isCampaign) {

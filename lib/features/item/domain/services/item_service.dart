@@ -169,7 +169,7 @@ class ItemService implements ItemServiceInterface {
   }
 
   @override
-  String prepareVariationType(List<ChoiceOptions>? choiceOptions, List<int>? variationIndex) {
+  Future<String> prepareVariationType(List<ChoiceOptions>? choiceOptions, List<int>? variationIndex) async{
     String variationType = '';
     if(!ModuleHelper.getModuleConfig(ModuleHelper.getModule() != null ? ModuleHelper.getModule()!.moduleType : ModuleHelper.getCacheModule()!.moduleType).newVariation!){
       List<String> variationList = [];
@@ -276,6 +276,46 @@ class ItemService implements ItemServiceInterface {
       startingPrice = item.price;
     }
     return startingPrice;
+  }
+
+  @override
+  Future<int> isExistInCartForBottomSheet(List<CartModel> cartList, int? itemId, int? cartIndex, List<List<bool?>>? variations) async{
+    for(int index=0; index<cartList.length; index++) {
+      if(cartList[index].item!.id == itemId) {
+        if((index == cartIndex)) {
+          return -1;
+        }else {
+          if(variations != null && variations.isNotEmpty) {
+            bool same = false;
+            for(int i=0; i<variations.length; i++) {
+              for(int j=0; j<variations[i].length; j++) {
+                if(variations[i][j] == cartList[index].foodVariations![i][j]) {
+                  same = true;
+                } else {
+                  same = false;
+                  break;
+                }
+
+              }
+              if(!same) {
+                break;
+              }
+            }
+            if(!same) {
+              continue;
+            }
+            if(same) {
+              return index;
+            } else {
+              return -1;
+            }
+          } else {
+            return index;
+          }
+        }
+      }
+    }
+    return -1;
   }
 
 }

@@ -61,12 +61,15 @@ class _WebBestReviewItemViewWidgetState extends State<WebBestReviewItemViewWidge
     return GetBuilder<ItemController>(builder: (itemController) {
       List<Item>? reviewItemList = itemController.reviewedItemList;
 
+      if(itemController.reviewedItemList != null && itemController.reviewedItemList!.isEmpty) {
+        reviewItemList = null;
+      }
       if(reviewItemList != null && reviewItemList.length > 5 && isFirstTime){
         showForwardButton = true;
         isFirstTime = false;
       }
 
-      return Stack(children: [
+      return reviewItemList != null ? reviewItemList.isNotEmpty ? Stack(children: [
         Container(
           margin: const EdgeInsets.only(top: Dimensions.paddingSizeLarge),
           child: Column(children: [
@@ -81,7 +84,7 @@ class _WebBestReviewItemViewWidgetState extends State<WebBestReviewItemViewWidge
 
             SizedBox(
               height: 285, width: Get.width,
-              child: reviewItemList != null ? ListView.builder(
+              child: ListView.builder(
                 controller: scrollController,
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -96,14 +99,14 @@ class _WebBestReviewItemViewWidgetState extends State<WebBestReviewItemViewWidge
                     ),
                     child: InkWell(
                       hoverColor: Colors.transparent,
-                        onTap: () => Get.find<ItemController>().navigateToItemPage(reviewItemList[index], context),
+                        onTap: () => Get.find<ItemController>().navigateToItemPage(reviewItemList![index], context),
                         child: ReviewItemCard(
                           item: itemController.reviewedItemList![index],
                         ),
                       ),
                     );
                 },
-              ) : const WebBestReviewItemShimmer(),
+              ),
             ),
           ]),
         ),
@@ -127,7 +130,7 @@ class _WebBestReviewItemViewWidgetState extends State<WebBestReviewItemViewWidge
           ),
         ),
 
-      ]);
+      ]) : const WebBestReviewItemShimmer() : const SizedBox();
     });
   }
 }
@@ -137,88 +140,115 @@ class WebBestReviewItemShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
-      itemCount: 8,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: EdgeInsets.only(
-          bottom: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault,
-          left: Get.find<LocalizationController>().isLtr ? 0 : Dimensions.paddingSizeDefault,
-          right: Get.find<LocalizationController>().isLtr ? Dimensions.paddingSizeDefault : 0,
-          ),
-          child: Shimmer(
-            duration: const Duration(seconds: 2),
-            enabled: true,
-            child: Container(
-              width: 210, height: 285,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+    return Column(
+      children: [
+
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical : Dimensions.paddingSizeSmall, horizontal: Dimensions.paddingSizeDefault),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 200, height: 20,
                 color: Colors.grey[300],
               ),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-                Expanded(
-                  child: Stack(children: [
-                    Padding(
-                      padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusSmall)),
-                        child: Container(
-                          color: Colors.grey[300],
-                          width: 210, height: 285,
-                        ),
-                      ),
-                    ),
+              Container(
+                width: 100, height: 20,
+                color: Colors.grey[300],
+              ),
 
-                    Positioned(
-                      top: 10, right: 10,
-                      child: Icon(Icons.favorite, size: 20, color: Theme.of(context).cardColor),
-                    ),
-
-
-                    Positioned(
-                      bottom: 0, left: 0, right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              height: 100, width: double.infinity,
-                              padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                              decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusDefault), topRight: Radius.circular(Dimensions.radiusDefault)),
-                                  color: Theme.of(context).cardColor
-                              ),
-                              child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-
-                                Container(
-                                  width: 100, height: 10,
-                                  color: Colors.grey[300],
-                                ),
-                                const SizedBox(height: Dimensions.paddingSizeSmall),
-
-                                Container(
-                                  width: 100, height: 10,
-                                  color: Colors.grey[300],
-                                ),
-                              ]),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                  ]),
-                ),
-              ]),
-            ),
+            ],
           ),
-        );
-      },
+        ),
+
+        SizedBox(
+          height: 285, width: Get.width,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault),
+            itemCount: 8,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: EdgeInsets.only(
+                bottom: Dimensions.paddingSizeDefault, top: Dimensions.paddingSizeDefault,
+                left: Get.find<LocalizationController>().isLtr ? 0 : Dimensions.paddingSizeDefault,
+                right: Get.find<LocalizationController>().isLtr ? Dimensions.paddingSizeDefault : 0,
+                ),
+                child: Shimmer(
+                  duration: const Duration(seconds: 2),
+                  enabled: true,
+                  child: Container(
+                    width: 210, height: 285,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(Dimensions.radiusSmall),
+                      color: Colors.grey[300],
+                    ),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
+                      Expanded(
+                        child: Stack(children: [
+                          Padding(
+                            padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.all(Radius.circular(Dimensions.radiusSmall)),
+                              child: Container(
+                                color: Colors.grey[300],
+                                width: 210, height: 285,
+                              ),
+                            ),
+                          ),
+
+                          Positioned(
+                            top: 10, right: 10,
+                            child: Icon(Icons.favorite, size: 20, color: Theme.of(context).cardColor),
+                          ),
+
+
+                          Positioned(
+                            bottom: 0, left: 0, right: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeDefault),
+                              child: Stack(
+                                clipBehavior: Clip.none,
+                                children: [
+                                  Container(
+                                    height: 100, width: double.infinity,
+                                    padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
+                                    decoration: BoxDecoration(
+                                        borderRadius: const BorderRadius.only(topLeft: Radius.circular(Dimensions.radiusDefault), topRight: Radius.circular(Dimensions.radiusDefault)),
+                                        color: Theme.of(context).cardColor
+                                    ),
+                                    child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+
+                                      Container(
+                                        width: 100, height: 10,
+                                        color: Colors.grey[300],
+                                      ),
+                                      const SizedBox(height: Dimensions.paddingSizeSmall),
+
+                                      Container(
+                                        width: 100, height: 10,
+                                        color: Colors.grey[300],
+                                      ),
+                                    ]),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                        ]),
+                      ),
+                    ]),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

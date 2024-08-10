@@ -36,8 +36,8 @@ class PriceConverter {
         value: toFixed(price!),
         textStyle: textStyle ?? robotoMedium,
         fractionDigits: forDM ? 0 : Get.find<SplashController>().configModel!.digitAfterDecimalPoint!,
-        prefix: isRightSide ? Get.find<SplashController>().configModel!.currencySymbol! : '',
-        suffix: isRightSide ? '' : Get.find<SplashController>().configModel!.currencySymbol!,
+        prefix: isRightSide ? '' : '${Get.find<SplashController>().configModel!.currencySymbol!} ',
+        suffix: isRightSide ? '${Get.find<SplashController>().configModel!.currencySymbol!} ' : '',
       ),
     );
   }

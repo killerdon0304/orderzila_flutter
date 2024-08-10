@@ -22,17 +22,20 @@ class LocalizationController extends GetxController implements GetxService {
   List<LanguageModel> _languages = [];
   List<LanguageModel> get languages => _languages;
 
-  int _selectedIndex = 0;
-  int get selectedIndex => _selectedIndex;
+  int _selectedLanguageIndex = 0;
+  int get selectedLanguageIndex => _selectedLanguageIndex;
 
-  void setLanguage(Locale locale) {
+  void setLanguage(Locale locale, {bool fromBottomSheet = false}) {
     Get.updateLocale(locale);
     _locale = locale;
     _isLtr = languageServiceInterface.setLTR(_locale);
     languageServiceInterface.updateHeader(_locale, Get.find<SplashController>().module?.id);
 
-    saveLanguage(_locale);
-    if(AddressHelper.getUserAddressFromSharedPref() != null) {
+    if(!fromBottomSheet) {
+      saveLanguage(_locale);
+    }
+    
+    if(AddressHelper.getUserAddressFromSharedPref() != null && !fromBottomSheet) {
       HomeScreen.loadData(true);
     } else {
       Get.find<SplashController>().getLandingPageData();
@@ -48,7 +51,7 @@ class LocalizationController extends GetxController implements GetxService {
   void loadCurrentLanguage() async {
     _locale = languageServiceInterface.getLocaleFromSharedPref();
     _isLtr = _locale.languageCode != 'ar';
-    _selectedIndex = languageServiceInterface.setselectedIndex(AppConstants.languages, _locale);
+    _selectedLanguageIndex = languageServiceInterface.setSelectedIndex(AppConstants.languages, _locale);
     _languages = [];
     _languages.addAll(AppConstants.languages);
     update();
@@ -58,25 +61,25 @@ class LocalizationController extends GetxController implements GetxService {
     languageServiceInterface.saveLanguage(locale);
   }
 
-  void setSelectIndex(int index) {
-    _selectedIndex = index;
+  void saveCacheLanguage(Locale? locale) {
+    languageServiceInterface.saveCacheLanguage(locale ?? languageServiceInterface.getLocaleFromSharedPref());
+  }
+
+  void setSelectLanguageIndex(int index) {
+    _selectedLanguageIndex = index;
     update();
   }
 
-  void searchLanguage(String query) {
-    if (query.isEmpty) {
-      _languages  = [];
-      _languages = AppConstants.languages;
-    } else {
-      _selectedIndex = -1;
-      _languages = [];
-      for (var language in AppConstants.languages) {
-        if (language.languageName!.toLowerCase().contains(query.toLowerCase())) {
-          _languages.add(language);
-        }
+  Locale getCacheLocaleFromSharedPref() {
+    return languageServiceInterface.getCacheLocaleFromSharedPref();
+  }
+
+  void searchSelectedLanguage() {
+    for (var language in AppConstants.languages) {
+      if (language.languageCode!.toLowerCase().contains(_locale.languageCode.toLowerCase())) {
+        _selectedLanguageIndex = AppConstants.languages.indexOf(language);
       }
     }
-    update();
   }
 
 }

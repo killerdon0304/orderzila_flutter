@@ -275,7 +275,7 @@ class ItemController extends GetxController implements GetxService {
       _item = await itemServiceInterface.getItemDetails(item.id);
     }
     initData(_item, null);
-    setExistInCart(_item, /*notify: !ResponsiveHelper.isDesktop(Get.context)*/);
+    setExistInCart(_item, _selectedVariations, /*notify: !ResponsiveHelper.isDesktop(Get.context)*/);
   }
 
   void showBottomLoader() {
@@ -311,7 +311,7 @@ class ItemController extends GetxController implements GetxService {
       _addOnActiveList.addAll(itemServiceInterface.initializeAddonActiveList(item.addOns));
       _addOnQtyList.addAll(itemServiceInterface.initializeAddonQtyList(item.addOns));
 
-      setExistInCart(item, notify: false);
+      setExistInCart(item, _selectedVariations, notify: true);
     }
 
   }
@@ -320,11 +320,11 @@ class ItemController extends GetxController implements GetxService {
     _cartIndex = -1;
   }
 
-  int setExistInCart(Item? item, {bool notify = false}) {
-    String variationType = itemServiceInterface.prepareVariationType(item!.choiceOptions, _variationIndex);
+  Future<int> setExistInCart(Item? item, List<List<bool?>>? selectedVariations, {bool notify = false}) async {
+    String variationType = await itemServiceInterface.prepareVariationType(item!.choiceOptions, _variationIndex);
 
     if(ModuleHelper.getModuleConfig(ModuleHelper.getModule() != null ? ModuleHelper.getModule()!.moduleType : ModuleHelper.getCacheModule()!.moduleType).newVariation!) {
-      _cartIndex = -1;
+      _cartIndex = await itemServiceInterface.isExistInCartForBottomSheet(Get.find<CartController>().cartList, item.id, null, selectedVariations);
     } else {
       _cartIndex = Get.find<CartController>().isExistInCart(item.id, variationType, false, null);
     }
@@ -333,6 +333,8 @@ class ItemController extends GetxController implements GetxService {
       _quantity = Get.find<CartController>().cartList[_cartIndex].quantity;
       _addOnActiveList = itemServiceInterface.initializeCartAddonActiveList(Get.find<CartController>().cartList[_cartIndex].addOnIds, item.addOns);
       _addOnQtyList = itemServiceInterface.initializeCartAddonsQtyList(Get.find<CartController>().cartList[_cartIndex].addOnIds, item.addOns);
+    } else {
+      _quantity = 1;
     }
     if(notify) {
       update();
@@ -353,7 +355,7 @@ class ItemController extends GetxController implements GetxService {
   void setCartVariationIndex(int index, int i, Item? item) {
     _variationIndex![index] = i;
     _quantity = 1;
-    setExistInCart(item);
+    setExistInCart(item, _selectedVariations);
     update();
   }
 
@@ -364,6 +366,7 @@ class ItemController extends GetxController implements GetxService {
 
   void setNewCartVariationIndex(int index, int i, Item item) {
     _selectedVariations = itemServiceInterface.setNewCartVariationIndex(index, i, item.foodVariations!, _selectedVariations);
+    setExistInCart(item, _selectedVariations);
     // if(!item.foodVariations![index].multiSelect!) {
     //   for(int j = 0; j < _selectedVariations[index].length; j++) {
     //     if(item.foodVariations![index].required!){
@@ -438,7 +441,7 @@ class ItemController extends GetxController implements GetxService {
         Dialog(child: ItemBottomSheet(item: item, inStorePage: inStore, isCampaign: isCampaign)),
       );
     }else {
-      Get.toNamed(RouteHelper.getItemDetailsRoute(item.id, inStore), arguments: ItemDetailsScreen(item: item, inStorePage: inStore));
+      Get.toNamed(RouteHelper.getItemDetailsRoute(item.id, inStore), arguments: ItemDetailsScreen(item: item, inStorePage: inStore, isCampaign: isCampaign));
     }
   }
 

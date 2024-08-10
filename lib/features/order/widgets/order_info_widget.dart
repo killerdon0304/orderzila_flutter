@@ -199,8 +199,7 @@ class OrderInfoWidget extends StatelessWidget {
                       text: '${'delivery_instruction'.tr}: ',
                       style: robotoMedium.copyWith(color: Theme.of(context).textTheme.bodyMedium!.color),
                       children: <TextSpan>[
-                        TextSpan(text: order.deliveryInstruction!,
-                            style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)
+                        TextSpan(text: order.deliveryInstruction!, style: robotoRegular
                         )
                       ]
                   ),
@@ -510,7 +509,7 @@ class OrderInfoWidget extends StatelessWidget {
               DeliveryDetailsWidget(from: true, address: order.store!.address),
 
               const SizedBox(height: Dimensions.paddingSizeSmall),
-              DeliveryDetailsWidget(from: false, address: order.deliveryAddress!.address),
+              DeliveryDetailsWidget(from: false, address: order.deliveryAddress?.address),
             ]),
           ) : const SizedBox(),
           SizedBox(height: !parcel ? Dimensions.paddingSizeSmall : 0),

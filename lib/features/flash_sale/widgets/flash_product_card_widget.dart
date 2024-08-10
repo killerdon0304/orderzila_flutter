@@ -16,7 +16,8 @@ import 'package:sixam_mart/common/widgets/organic_tag.dart';
 
 class FlashProductCardWidget extends StatelessWidget {
   final Products product;
-  const FlashProductCardWidget({super.key, required this.product});
+  final int? index;
+  const FlashProductCardWidget({super.key, required this.product, this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -77,6 +78,7 @@ class FlashProductCardWidget extends StatelessWidget {
                   ),
                 ) : CartCountView(
                   item: product.item!,
+                  index: index,
                   child: Center(
                     child: Container(
                       alignment: Alignment.center,

@@ -45,7 +45,7 @@ class _BrandsScreenState extends State<BrandsScreen> {
                 width: Dimensions.webMaxWidth,
                 child: brandsController.brandList != null ? brandsController.brandList!.isNotEmpty ? GridView.builder(
                   shrinkWrap: true,
-                  physics: isDesktop ? const NeverScrollableScrollPhysics() : const AlwaysScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                   padding: EdgeInsets.symmetric(
                     horizontal: isDesktop ? 0 : Dimensions.paddingSizeExtraLarge,
                     vertical: Dimensions.paddingSizeExtraLarge,

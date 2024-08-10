@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:meta_seo/meta_seo.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/brands/screens/brands_product_screen.dart';
 import 'package:sixam_mart/features/brands/screens/brands_screen.dart';
-import 'package:sixam_mart/features/business/screens/business_plan_screen.dart';
 import 'package:sixam_mart/features/business/screens/subscription_payment_screen.dart';
 import 'package:sixam_mart/features/business/screens/subscription_success_or_failed_screen.dart';
 import 'package:sixam_mart/features/loyalty/screens/loyalty_screen.dart';
@@ -121,7 +118,7 @@ class RouteHelper {
   static const String checkout = '/checkout';
   static const String orderTracking = '/track-order';
   static const String basicCampaign = '/basic-campaign';
-  static const String html = '/html';
+  static const String html = '/html-page';
   static const String categories = '/categories';
   static const String categoryItem = '/category-item';
   static const String popularItems = '/popular-items';
@@ -166,7 +163,7 @@ class RouteHelper {
   static const String brandsItemScreen = '/brands-item-screen';
 
   static const String subscriptionSuccess = '/subscription-success';
-  static const String businessPlan = '/business-plan';
+  // static const String businessPlan = '/business-plan';
   static const String subscriptionPayment = '/subscription-payment';
 
 
@@ -200,14 +197,6 @@ class RouteHelper {
   static String getResetPasswordRoute(String? phone, String token, String page) => '$resetPassword?phone=$phone&token=$token&page=$page';
   static String getSearchRoute({String? queryText}) => '$search?query=${queryText ?? ''}';
   static String getStoreRoute({required int? id, required String page}) {
-    if(kIsWeb) {
-      // Define MetaSEO object
-      MetaSEO meta = MetaSEO();
-      // add meta seo data for web app as you want
-      meta.ogTitle(ogTitle: 'Store Screen');
-      meta.description(description: 'This is Store screen. Here have all information of store');
-      meta.keywords(keywords: 'Flutter, Dart, SEO, Meta, Web');
-    }
     return '$store?id=$id&page=$page';
   }
   static String getOrderDetailsRoute(int? orderID, {bool? fromNotification, bool? fromOffline, String? contactNumber}) {
@@ -217,17 +206,17 @@ class RouteHelper {
   static String getUpdateProfileRoute() => updateProfile;
   static String getCouponRoute() => coupon;
   static String getNotificationRoute({bool? fromNotification}) => '$notification?from=${fromNotification.toString()}';
-  static String getMapRoute(AddressModel addressModel, String page, bool isFood) {
+  static String getMapRoute(AddressModel addressModel, String page, bool isFood, {String? storeName}) {
     List<int> encoded = utf8.encode(jsonEncode(addressModel.toJson()));
     String data = base64Encode(encoded);
-    return '$map?address=$data&page=$page&module=$isFood';
+    return '$map?address=$data&page=$page&module=$isFood&store-name=$storeName';
   }
   static String getAddressRoute() => address;
-  static String getOrderSuccessRoute(String orderID, String? contactNumber) {
-    return '$orderSuccess?id=$orderID&contact_number=$contactNumber';
+  static String getOrderSuccessRoute(String orderID, String? contactNumber, {bool? createAccount, String guestId = ''}) {
+    return '$orderSuccess?id=$orderID&contact_number=$contactNumber&create_account=$createAccount&guest_id=$guestId';
   }
-  static String getPaymentRoute(String id, int? user, String? type, double amount, bool? codDelivery, String? paymentMethod, {required String guestId, String? contactNumber, String? addFundUrl, String? subscriptionUrl, int? storeId}
-      ) => '$payment?id=$id&user=$user&type=$type&amount=$amount&cod-delivery=$codDelivery&add-fund-url=$addFundUrl&payment-method=$paymentMethod&guest-id=$guestId&number=$contactNumber&subscription-url=$subscriptionUrl&store_id=$storeId';
+  static String getPaymentRoute(String id, int? user, String? type, double amount, bool? codDelivery, String? paymentMethod, {required String guestId, String? contactNumber, String? addFundUrl, String? subscriptionUrl, int? storeId, bool? createAccount}
+      ) => '$payment?id=$id&user=$user&type=$type&amount=$amount&cod-delivery=$codDelivery&add-fund-url=$addFundUrl&payment-method=$paymentMethod&guest-id=$guestId&number=$contactNumber&subscription-url=$subscriptionUrl&store_id=$storeId&create_account=$createAccount';
   static String getCheckoutRoute(String page,{int? storeId}) => '$checkout?page=$page&store-id=$storeId';
   static String getOrderTrackingRoute(int? id, String? contactNumber) => '$orderTracking?id=$id&number=$contactNumber';
   static String getBasicCampaignRoute(BasicCampaignModel basicCampaignModel) {
@@ -344,7 +333,7 @@ class RouteHelper {
 
   static String getSubscriptionSuccessRoute({String? status, required bool fromSubscription, int? storeId}) => '$subscriptionSuccess?flag=$status&from_subscription=$fromSubscription&store_id=$storeId';
   //static String getBusinessPlanRoute(int? storeId) => '$businessPlan?id=$storeId';
-  static String getBusinessPlanRoute(int? storeId) => '$businessPlan?id=$storeId';
+  // static String getBusinessPlanRoute(int? storeId, int? packageId) => '$businessPlan?id=$storeId&packageId=$packageId';
   static String getSubscriptionPaymentRoute({required int? storeId, required int? packageId}) => '$subscriptionPayment?store-id=$storeId&package-id=$packageId';
 
   static List<GetPage> routes = [
@@ -421,7 +410,7 @@ class RouteHelper {
     GetPage(name: map, page: () {
       List<int> decode = base64Decode(Get.parameters['address']!.replaceAll(' ', '+'));
       AddressModel data = AddressModel.fromJson(jsonDecode(utf8.decode(decode)));
-      return getRoute(MapScreen(fromStore: Get.parameters['page'] == 'store', address: data, isFood: Get.parameters['module'] == 'true'));
+      return getRoute(MapScreen(fromStore: Get.parameters['page'] == 'store', address: data, isFood: Get.parameters['module'] == 'true', storeName: Get.parameters['store-name'] ?? ''));
     }),
     GetPage(name: address, page: () => getRoute(const AddressScreen())),
     GetPage(name: orderSuccess, page: () => getRoute(OrderSuccessfulScreen(
@@ -429,6 +418,7 @@ class RouteHelper {
       contactPersonNumber: Get.parameters['contact_number'] != null && Get.parameters['contact_number'] != 'null'
           ? Get.parameters['contact_number']
           : AuthHelper.isGuestLoggedIn() ? Get.find<AuthController>().getGuestNumber() : null,
+      createAccount: Get.parameters['create_account'] == 'true', guestId: Get.parameters['guest_id'] ?? '',
     ),
     )),
     GetPage(name: payment, page: () {
@@ -449,12 +439,13 @@ class RouteHelper {
       String guestId = Get.parameters['guest-id']!;
       String number = Get.parameters['number']!;
       int? storeId = (Get.parameters['store_id'] != null && Get.parameters['store_id'] != 'null') ? int.parse(Get.parameters['store_id']!) : null;
+      bool createAccount = Get.parameters['create_account'] == 'true';
       return getRoute(AppConstants.payInWevView ? PaymentWebViewScreen(
         orderModel: order, isCashOnDelivery: isCodActive, addFundUrl: addFundUrl, paymentMethod: paymentMethod, guestId: guestId,
-        contactNumber: number, subscriptionUrl: subscriptionUrl, storeId: storeId,
+        contactNumber: number, subscriptionUrl: subscriptionUrl, storeId: storeId, createAccount: createAccount,
       ) : PaymentScreen(
         orderModel: order, isCashOnDelivery: isCodActive, addFundUrl: addFundUrl, paymentMethod: paymentMethod, guestId: guestId,
-        contactNumber: number, subscriptionUrl: subscriptionUrl, storeId: storeId,
+        contactNumber: number, subscriptionUrl: subscriptionUrl, storeId: storeId, createAccount: createAccount,
       ));
     }),
     GetPage(name: checkout, page: () {
@@ -600,9 +591,9 @@ class RouteHelper {
       brandId: int.parse(Get.parameters['brandId']!), brandName: Get.parameters['brandName']!,
     )),
 
-    GetPage(name: subscriptionSuccess, page: () => getRoute(SubscriptionSuccessOrFailedScreen(success: Get.parameters['flag'] == 'success', fromSubscription: Get.parameters['from_subscription'] == 'true', storeId: (Get.parameters['store_id'] != null && Get.parameters['store_id'] != 'null') ? int.parse(Get.parameters['store_id']!) : null))),
+    GetPage(name: subscriptionSuccess, page: () => SubscriptionSuccessOrFailedScreen(success: Get.parameters['flag'] == 'success', fromSubscription: Get.parameters['from_subscription'] == 'true', storeId: (Get.parameters['store_id'] != null && Get.parameters['store_id'] != 'null') ? int.parse(Get.parameters['store_id']!) : null)),
     //GetPage(name: businessPlan, page: () => BusinessPlanScreen(storeId: int.parse(Get.parameters['id']!))),
-    GetPage(name: businessPlan, page: () => BusinessPlanScreen(storeId: int.parse(Get.parameters['id']!))),
+    // GetPage(name: businessPlan, page: () => BusinessPlanScreen(storeId: int.parse(Get.parameters['id']!), packageId: Get.parameters['id'] != 'null' ? int.parse(Get.parameters['id']!) : null)),
     GetPage(name: subscriptionPayment, page: () => SubscriptionPaymentScreen(storeId: int.parse(Get.parameters['store-id']!), packageId: int.parse(Get.parameters['package-id']!))),
   ];
 

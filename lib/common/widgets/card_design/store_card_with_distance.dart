@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:sixam_mart/common/widgets/custom_ink_well.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
@@ -31,9 +31,8 @@ class StoreCardWithDistance extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isPharmacy = Get.find<SplashController>().module != null && Get.find<SplashController>().module!.moduleType.toString() == AppConstants.pharmacy;
-    double distance = Get.find<StoreController>().getRestaurantDistance(
-      LatLng(double.parse(store.latitude!), double.parse(store.longitude!)),
-    );
+    double distance = (store.distance!/1000);
+    String formattedDistance = NumberFormat.compact().format(distance);
     return Stack(
       children: [
         Container(
@@ -93,7 +92,7 @@ class StoreCardWithDistance extends StatelessWidget {
                           onTap: () {
                             if(AuthHelper.isLoggedIn()) {
                               isWished ? favouriteController.removeFromFavouriteList(store.id, true)
-                                  : favouriteController.addToFavouriteList(null, store, true);
+                                  : favouriteController.addToFavouriteList(null, store.id, true);
                             }else {
                               showCustomSnackBar('you_are_not_logged_in'.tr);
                             }
@@ -148,7 +147,6 @@ class StoreCardWithDistance extends StatelessWidget {
                           decoration: BoxDecoration(
                             color: Theme.of(context).primaryColor.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(Dimensions.radiusLarge),
-                            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 5, spreadRadius: 1)],
                           ),
                           child: Row(children: [
 
@@ -156,7 +154,7 @@ class StoreCardWithDistance extends StatelessWidget {
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
                             Text(
-                              '${distance > 100 ? '100+' : distance.toStringAsFixed(2)} ${'km'.tr}',
+                              '$formattedDistance ${'km'.tr}',
                               style: robotoBold.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeExtraSmall),
                             ),
                             const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -217,7 +215,7 @@ class StoreCardWithDistance extends StatelessWidget {
                 ),
               ),
 
-              Positioned(
+              store.avgRating! > 0 ? Positioned(
                 bottom: -5, right: 5, left: 5,
                 child: Container(
                   decoration: BoxDecoration(
@@ -232,7 +230,7 @@ class StoreCardWithDistance extends StatelessWidget {
                     Icon(Icons.star, color: Theme.of(context).primaryColor, size: 15),
                   ]),
                 ),
-              ),
+              ) : const SizedBox(),
             ],
           ),
         ),

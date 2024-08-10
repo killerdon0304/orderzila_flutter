@@ -3,13 +3,13 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:get/get.dart';
 import 'package:image_compression_flutter/image_compression_flutter.dart';
 import 'package:just_the_tooltip/just_the_tooltip.dart';
+import 'package:sixam_mart/features/checkout/widgets/guest_create_account.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/address/domain/models/address_model.dart';
 import 'package:sixam_mart/features/cart/domain/models/cart_model.dart';
 import 'package:sixam_mart/common/models/config_model.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
-import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -53,6 +53,14 @@ class TopSection extends StatelessWidget {
   final JustTheController tooltipController1;
   final JustTheController tooltipController2;
   final JustTheController dmTipsTooltipController;
+  final TextEditingController guestPasswordController;
+  final TextEditingController guestConfirmPasswordController;
+  final FocusNode guestPasswordNode;
+  final FocusNode guestConfirmPasswordNode;
+  final double variationPrice;
+  final String deliveryChargeForView;
+  final double badWeatherCharge;
+  final double extraChargeForToolTip;
 
   const TopSection({
     super.key, required this.deliveryCharge, required  this.charge, required this.tomorrowClosed,
@@ -63,7 +71,9 @@ class TopSection extends StatelessWidget {
     required this.total, required this.isOfflinePaymentActive, required this.guestNameTextEditingController,
     required this.guestNumberTextEditingController, required this.guestNumberNode,
     required this.guestEmailController, required this.guestEmailNode, required this.tooltipController1,
-    required this.tooltipController2, required this.dmTipsTooltipController,
+    required this.tooltipController2, required this.dmTipsTooltipController, required this.guestPasswordController, required this.guestConfirmPasswordController,
+    required this.guestPasswordNode, required this.guestConfirmPasswordNode, required this.variationPrice, required this.deliveryChargeForView,
+    required this.badWeatherCharge, required this.extraChargeForToolTip,
   });
 
   @override
@@ -209,24 +219,27 @@ class TopSection extends StatelessWidget {
               storeId != null ? DeliveryOptionButtonWidget(
                 value: 'delivery', title: 'home_delivery'.tr, charge: charge,
                 isFree: checkoutController.store!.freeDelivery, fromWeb: true, total: total,
+                deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
               ) : SingleChildScrollView(scrollDirection: Axis.horizontal, child: Row(children: [
                 Get.find<SplashController>().configModel!.homeDeliveryStatus == 1 && checkoutController.store!.delivery! ? DeliveryOptionButtonWidget(
                   value: 'delivery', title: 'home_delivery'.tr, charge: charge,
                   isFree: checkoutController.store!.freeDelivery,  fromWeb: true, total: total,
+                  deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
                 ) : const SizedBox(),
                 const SizedBox(width: Dimensions.paddingSizeDefault),
 
                 Get.find<SplashController>().configModel!.takeawayStatus == 1 && checkoutController.store!.takeAway! ? DeliveryOptionButtonWidget(
                   value: 'take_away', title: 'take_away'.tr, charge: deliveryCharge, isFree: true,  fromWeb: true, total: total,
+                  deliveryChargeForView: deliveryChargeForView, badWeatherCharge: badWeatherCharge, extraChargeForToolTip: extraChargeForToolTip,
                 ) : const SizedBox(),
               ]),
               ),
             ],
           ),
         ),
-        const SizedBox(height: Dimensions.paddingSizeDefault),
+        const SizedBox(height: Dimensions.paddingSizeLarge),
 
-        ///Delivery_fee
+        /*///Delivery_fee
         !takeAway && !isGuestLoggedIn ? Center(child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Text('${'delivery_charge'.tr}: '),
           Text(
@@ -235,7 +248,7 @@ class TopSection extends StatelessWidget {
             textDirection: TextDirection.ltr,
           ),
         ])) : const SizedBox(),
-        SizedBox(height: !takeAway && !isGuestLoggedIn ? Dimensions.paddingSizeLarge : 0),
+        SizedBox(height: !takeAway && !isGuestLoggedIn ? Dimensions.paddingSizeLarge : 0),*/
 
         ///delivery section
         DeliverySection(checkoutController: checkoutController, address: address, addressList: addressList,
@@ -247,8 +260,15 @@ class TopSection extends StatelessWidget {
 
         ///delivery instruction
         !takeAway ? isDesktop ? const WebDeliveryInstructionView() : const DeliveryInstructionView() : const SizedBox(),
+        SizedBox(height: !takeAway ? isDesktop ? Dimensions.paddingSizeLarge : Dimensions.paddingSizeSmall : 0),
 
-        SizedBox(height: !takeAway ? Dimensions.paddingSizeSmall : 0),
+        ///Create Account with existing info
+
+        isGuestLoggedIn ? GuestCreateAccount(
+          guestPasswordController: guestPasswordController, guestConfirmPasswordController: guestConfirmPasswordController,
+          guestPasswordNode: guestPasswordNode, guestConfirmPasswordNode: guestConfirmPasswordNode,
+        ) : const SizedBox(),
+        SizedBox(height: isGuestLoggedIn ? Dimensions.paddingSizeSmall : 0),
 
         /// Time Slot
         TimeSlotSection(
@@ -259,7 +279,7 @@ class TopSection extends StatelessWidget {
         /// Coupon..
         !isDesktop && !isGuestLoggedIn ? CouponSection(
           storeId: storeId, checkoutController: checkoutController, total: total, price: price,
-          discount: discount, addOns: addOns, deliveryCharge: deliveryCharge,
+          discount: discount, addOns: addOns, deliveryCharge: deliveryCharge, variationPrice: variationPrice,
         ) : const SizedBox(),
 
         ///DmTips..

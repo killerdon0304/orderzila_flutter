@@ -47,7 +47,7 @@ class VegFilterWidget extends StatelessWidget {
               border: Border.all(color: Theme.of(context).primaryColor, width: 1)
           ),
           padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
-          child: Icon(Icons.filter_list, size: 24, color: Theme.of(context).primaryColor),
+          child: const Icon(Icons.filter_list, size: 24),
         ),
       ),
     ) : const SizedBox();

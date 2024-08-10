@@ -1,6 +1,7 @@
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/order/controllers/order_controller.dart';
+import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
@@ -17,7 +18,8 @@ class PaymentFailedDialog extends StatelessWidget {
   final double? orderAmount;
   final double? maxCodOrderAmount;
   final bool? isCashOnDelivery;
-  const PaymentFailedDialog({super.key, required this.orderID, required this.maxCodOrderAmount, required this.orderAmount, required this.orderType, required this.isCashOnDelivery});
+  final String guestId;
+  const PaymentFailedDialog({super.key, required this.orderID, required this.maxCodOrderAmount, required this.orderAmount, required this.orderType, required this.isCashOnDelivery, required this.guestId});
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +59,12 @@ class PaymentFailedDialog extends StatelessWidget {
                 buttonText: 'switch_to_cash_on_delivery'.tr,
                 onPressed: () {
                   if((((maxCodOrderAmount != null && orderAmount! < maxCodOrderAmount!) || maxCodOrderAmount == null || maxCodOrderAmount == 0) && orderType != 'parcel') || orderType == 'parcel'){
-                    orderController.switchToCOD(orderID).then((success){
+                    orderController.switchToCOD(orderID, guestId: guestId.isNotEmpty ? guestId : null).then((success){
                       if(success){
                         double total = ((orderAmount! / 100) * Get.find<SplashController>().configModel!.loyaltyPointItemPurchasePoint!);
-                        Get.find<AuthController>().saveEarningPoint(total.toStringAsFixed(0));
+                        if(AuthHelper.isLoggedIn()) {
+                          Get.find<AuthController>().saveEarningPoint(total.toStringAsFixed(0));
+                        }
                       }
                     });
                   }else{
@@ -76,7 +80,7 @@ class PaymentFailedDialog extends StatelessWidget {
 
               TextButton(
                 onPressed: () {
-                  Get.find<OrderController>().cancelOrder(int.parse(orderID!), 'Digital payment issue').then((success) {
+                  Get.find<OrderController>().cancelOrder(int.parse(orderID!), 'Digital payment issue', guestId: guestId.isNotEmpty ? guestId : null).then((success) {
                     if(success){
                       Get.offAllNamed(RouteHelper.getInitialRoute());
                     }

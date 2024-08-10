@@ -8,12 +8,13 @@ class PortionWidget extends StatelessWidget {
   final bool hideDivider;
   final String route;
   final String? suffix;
-  const PortionWidget({super.key, required this.icon, required this.title, required this.route, this.hideDivider = false, this.suffix});
+  final Function()? onTap;
+  const PortionWidget({super.key, required this.icon, required this.title, required this.route, this.hideDivider = false, this.suffix, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: ()=> Get.toNamed(route),
+      onTap: onTap ?? () => Get.toNamed(route),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall),
         child: Column(children: [

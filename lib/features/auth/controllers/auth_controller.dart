@@ -30,6 +30,9 @@ class AuthController extends GetxController implements GetxService {
   bool _isActiveRememberMe = false;
   bool get isActiveRememberMe => _isActiveRememberMe;
 
+  bool _notificationLoading = false;
+  bool get notificationLoading => _notificationLoading;
+
   void toggleRememberMe() {
     _isActiveRememberMe = !_isActiveRememberMe;
     update();
@@ -111,9 +114,9 @@ class AuthController extends GetxController implements GetxService {
     return authServiceInterface.getSharedPrefGuestId();
   }
 
-  bool clearSharedData() {
+  Future<bool> clearSharedData() async {
     Get.find<SplashController>().setModule(null);
-    return authServiceInterface.clearSharedData();
+    return await authServiceInterface.clearSharedData();
   }
 
   Future<void> socialLogout() async {
@@ -179,11 +182,18 @@ class AuthController extends GetxController implements GetxService {
     return authServiceInterface.getEarningPint();
   }
 
-  bool setNotificationActive(bool isActive) {
+  Future<bool> setNotificationActive(bool isActive) async {
+    _notificationLoading = true;
+    update();
     _notification = isActive;
-    authServiceInterface.setNotificationActive(isActive);
+    await authServiceInterface.setNotificationActive(isActive);
+    _notificationLoading = false;
     update();
     return _notification;
+  }
+
+  Future<String?> saveDeviceToken() async {
+    return await authServiceInterface.saveDeviceToken();
   }
 
 }

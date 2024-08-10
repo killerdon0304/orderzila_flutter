@@ -68,7 +68,11 @@ class Message {
     message = json['message'];
     if(json['file_full_url'] != null) {
       fileFullUrl = [];
-      json['file_full_url'].forEach((v) => fileFullUrl!.add(v));
+      json['file_full_url'].forEach((v) {
+        if(v != null) {
+          fileFullUrl!.add(v.toString());
+        }
+      });
     }
     isSeen = json['is_seen'];
     createdAt = json['created_at'];

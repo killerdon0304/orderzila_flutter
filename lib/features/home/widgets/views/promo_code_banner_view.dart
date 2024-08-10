@@ -95,7 +95,7 @@ class _PromoCodeBannerViewState extends State<PromoCodeBannerView> {
                                 Icon(Icons.copy, color: Theme.of(context).primaryColor, size: 16),
                                 const SizedBox(width: Dimensions.paddingSizeExtraSmall),
 
-                                Text(couponController.couponList![itemIndex].code ?? '', style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall)),
+                                Flexible(child: Text(couponController.couponList![itemIndex].code ?? '', style: robotoMedium.copyWith(color: Theme.of(context).primaryColor, fontSize: Dimensions.fontSizeSmall), maxLines: 1, overflow: TextOverflow.ellipsis)),
                               ]),
                             ),
                           ),

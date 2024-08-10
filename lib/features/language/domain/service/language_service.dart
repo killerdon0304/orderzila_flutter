@@ -27,7 +27,7 @@ class LanguageService implements LanguageServiceInterface {
   }
 
   @override
-  setselectedIndex(List<LanguageModel> languages, Locale locale) {
+  setSelectedIndex(List<LanguageModel> languages, Locale locale) {
     int selectedIndex = 0;
     for(int index = 0; index<languages.length; index++) {
       if(languages[index].languageCode == locale.languageCode) {
@@ -41,6 +41,16 @@ class LanguageService implements LanguageServiceInterface {
   @override
   void saveLanguage(Locale locale) {
     languageRepositoryInterface.saveLanguage(locale);
+  }
+
+  @override
+  void saveCacheLanguage(Locale locale) {
+    languageRepositoryInterface.saveCacheLanguage(locale);
+  }
+
+  @override
+  Locale getCacheLocaleFromSharedPref() {
+    return languageRepositoryInterface.getCacheLocaleFromSharedPref();
   }
 
 }

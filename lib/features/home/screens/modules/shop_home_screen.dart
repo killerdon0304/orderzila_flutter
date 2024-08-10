@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sixam_mart/features/home/widgets/brands_view_widget.dart';
+import 'package:sixam_mart/features/home/widgets/highlight_widget.dart';
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/features/flash_sale/widgets/flash_sale_view_widget.dart';
@@ -49,6 +50,7 @@ class ShopHomeScreen extends StatelessWidget {
       const MostPopularItemView(isFood: false, isShop: true),
       const FlashSaleViewWidget(),
       const MiddleSectionBannerView(),
+      const HighlightWidget(),
       const PopularStoreView(),
       const BrandsViewWidget(),
       const SpecialOfferView(isFood: false, isShop: true),

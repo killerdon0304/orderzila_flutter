@@ -230,7 +230,9 @@ class OrderModel {
     if(json['order_proof_full_url'] != null){
       orderProofFullUrl = [];
       json['order_proof_full_url'].forEach((v) {
-        orderProofFullUrl!.add(v);
+        if(v != null) {
+          orderProofFullUrl!.add(v.toString());
+        }
       });
     }
     offlinePayment = json['offline_payment'] != null ? OfflinePayment.fromJson(json['offline_payment']) : null;

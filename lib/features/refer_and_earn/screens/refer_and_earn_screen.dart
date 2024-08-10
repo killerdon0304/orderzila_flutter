@@ -10,6 +10,7 @@ import 'package:sixam_mart/features/profile/controllers/profile_controller.dart'
 import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -151,7 +152,12 @@ class _ReferAndEarnScreenState extends State<ReferAndEarnScreen> {
                         Wrap(children: [
 
                           InkWell(
-                            onTap: () => Share.share('${'this_is_my_refer_code'.tr}: ${profileController.userInfoModel!.refCode}'),
+                            onTap: () {
+                              Share.share(
+                                Get.find<SplashController>().configModel?.appUrlAndroid != null ? '${AppConstants.appName} ${'referral_code'.tr}: ${profileController.userInfoModel!.refCode} \n${'download_app_from_this_link'.tr}: ${Get.find<SplashController>().configModel?.appUrlAndroid}'
+                                  : '${AppConstants.appName} ${'referral_code'.tr}: ${profileController.userInfoModel!.refCode}',
+                              );
+                            },
                             child: Container(
                               decoration: BoxDecoration(
                                 shape: BoxShape.circle,

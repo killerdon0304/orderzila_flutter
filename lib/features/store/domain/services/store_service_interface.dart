@@ -8,7 +8,7 @@ import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:sixam_mart/features/location/domain/models/zone_response_model.dart';
 
 abstract class StoreServiceInterface {
-  Future<StoreModel?> getStoreList(int offset, String filterBy);
+  Future<StoreModel?> getStoreList(int offset, String filterBy, String storeType);
   Future<List<Store>?> getPopularStoreList(String type);
   Future<List<Store>?> getLatestStoreList(String type);
   Future<Response> getFeaturedStoreList();
@@ -21,4 +21,5 @@ abstract class StoreServiceInterface {
   Future<List<StoreBannerModel>?> getStoreBannerList(int? storeId);
   Future<List<Store>?> getRecommendedStoreList();
   List<Modules> moduleList();
+  String filterRestaurantLinkUrl(String slug, Store store);
 }

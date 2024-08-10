@@ -32,7 +32,7 @@ class _SubscriptionPaymentScreenState extends State<SubscriptionPaymentScreen> {
   void initState() {
     super.initState();
 
-    Get.find<BusinessController>().getPackageList(isUpdate: false);
+    // Get.find<BusinessController>().getPackageList(isUpdate: false);
   }
 
   @override

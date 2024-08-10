@@ -87,11 +87,11 @@ class StoreCard extends StatelessWidget {
                       ),
                       const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                      !isPharmacy ? RatingBar(
+                      !isPharmacy ? store.ratingCount! > 0 ? RatingBar(
                         rating: store.avgRating,
                         ratingCount: store.ratingCount,
                         size: 12,
-                      ) : Row(children: [
+                      ) : const SizedBox() : Row(children: [
 
                         Icon(Icons.storefront, size: 15, color: Theme.of(context).primaryColor),
                         const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -175,7 +175,7 @@ class StoreCard extends StatelessWidget {
                   onTap: () {
                     if(AuthHelper.isLoggedIn()) {
                       isWished ? favouriteController.removeFromFavouriteList(store.id, true)
-                          : favouriteController.addToFavouriteList(null, store, true);
+                          : favouriteController.addToFavouriteList(null, store.id, true);
                     }else {
                       showCustomSnackBar('you_are_not_logged_in'.tr);
                     }

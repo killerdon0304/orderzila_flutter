@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class StoreModel {
   int? totalSize;
   String? limit;
@@ -82,6 +80,8 @@ class Store {
   int? reviewsCommentsCount;
   StoreSubscription? storeSubscription;
   String? storeBusinessModel;
+  double? distance;
+  String? storeOpeningTime;
 
   Store({
     this.id,
@@ -133,6 +133,8 @@ class Store {
     this.reviewsCommentsCount,
     this.storeSubscription,
     this.storeBusinessModel,
+    this.distance,
+    this.storeOpeningTime,
   });
 
   Store.fromJson(Map<String, dynamic> json) {
@@ -201,6 +203,8 @@ class Store {
     reviewsCommentsCount = json['reviews_comments_count'];
     storeSubscription = json['store_sub'] != null ? StoreSubscription.fromJson(json['store_sub']) : null;
     storeBusinessModel = json['store_business_model'];
+    distance = json['distance']?.toDouble();
+    storeOpeningTime = json['current_opening_time'];
   }
 
   Map<String, dynamic> toJson() {
@@ -262,6 +266,7 @@ class Store {
       data['store_sub'] = storeSubscription!.toJson();
     }
     data['store_business_model'] = storeBusinessModel;
+    data['distance'] = distance;
     return data;
   }
 }

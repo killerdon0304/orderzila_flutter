@@ -1,12 +1,11 @@
-import 'package:sixam_mart/features/language/widgets/web_language_widget.dart';
+import 'package:sixam_mart/common/widgets/custom_asset_image_widget.dart';
+import 'package:sixam_mart/features/language/screens/web_language_screen.dart';
+import 'package:sixam_mart/features/language/widgets/language_card_widget.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/styles.dart';
 import 'package:sixam_mart/common/widgets/custom_app_bar.dart';
-import 'package:sixam_mart/common/widgets/footer_view.dart';
 import 'package:sixam_mart/common/widgets/menu_drawer.dart';
-import 'package:sixam_mart/common/widgets/web_page_title_widget.dart';
-import 'package:sixam_mart/features/language/widgets/language_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/util/app_constants.dart';
@@ -28,105 +27,81 @@ class _ChooseLanguageScreenState extends State<ChooseLanguageScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: (widget.fromMenu || ResponsiveHelper.isDesktop(context)) ? CustomAppBar(title: 'language'.tr, backButton: true) : null,
-      endDrawer: const MenuDrawer(),endDrawerEnableOpenDragGesture: false,
-      body: SafeArea(
-        child: GetBuilder<LocalizationController>(builder: (localizationController) {
-          return Column(children: [
-            WebScreenTitleWidget(title: 'language'.tr),
-            Expanded(child: Center(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: ResponsiveHelper.isDesktop(context) ? EdgeInsets.zero : const EdgeInsets.all(Dimensions.paddingSizeSmall),
-                child: Center(child: FooterView(minHeight: 0.615,
-                  child: SizedBox(
-                    width: Dimensions.webMaxWidth,
-                    child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+      endDrawer: const MenuDrawer(), endDrawerEnableOpenDragGesture: false,
+      backgroundColor: Theme.of(context).cardColor,
+      body: GetBuilder<LocalizationController>(builder: (localizationController) {
+        return ResponsiveHelper.isDesktop(context) ? const WebLanguageScreen() : Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const SizedBox(height: 40),
 
-                      !ResponsiveHelper.isDesktop(context) ? Center(child: Image.asset(Images.logo, width: 200)) : const SizedBox.shrink(),
-                      SizedBox(height: Get.find<LocalizationController>().isLtr ? 30 : 25),
+          const Align(
+            alignment: Alignment.center,
+            child: CustomAssetImageWidget(
+              Images.languageBg,
+              height: 210, width: 210,
+              fit: BoxFit.contain,
+            ),
+          ),
 
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                        child: Text('select_language'.tr, style: robotoMedium),
-                      ),
-                      const SizedBox(height: Dimensions.paddingSizeLarge),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+            child: Text('choose_your_language'.tr, style: robotoBold.copyWith(fontSize: Dimensions.fontSizeLarge)),
+          ),
+          const SizedBox(height: Dimensions.paddingSizeExtraSmall),
 
-                      Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: ResponsiveHelper.isDesktop(context) ? 2 : ResponsiveHelper.isTab(context) ? 3 : 2,
-                            childAspectRatio: ResponsiveHelper.isDesktop(context) ? 6 : (1/1),
-                            mainAxisSpacing: Dimensions.paddingSizeDefault,
-                            crossAxisSpacing: Dimensions.paddingSizeDefault,
-                          ),
-                          itemCount: localizationController.languages.length,
-                          physics: const NeverScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-                          itemBuilder: (context, index) => ResponsiveHelper.isDesktop(context) ? WebLanguageWidget(
-                            languageModel: localizationController.languages[index],
-                            localizationController: localizationController, index: index,
-                          ) : LanguageWidget(
-                            languageModel: localizationController.languages[index],
-                            localizationController: localizationController, index: index,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: Dimensions.paddingSizeExtremeLarge),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+            child: Text('choose_your_language_to_proceed'.tr, style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall)),
+          ),
+          const SizedBox(height: Dimensions.paddingSizeExtraLarge),
 
-                      !ResponsiveHelper.isDesktop(context) ? Center(
-                        child: Text(
-                          'you_can_change_language'.tr,
-                          style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).disabledColor),
-                        ),
-                      ) : const SizedBox.shrink(),
-
-                    ]),
-                  ),
-                )),
+          Expanded(
+            child: SingleChildScrollView(
+              child: ListView.builder(
+                itemCount: localizationController.languages.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeLarge),
+                itemBuilder: (context, index) {
+                  return LanguageCardWidget(
+                    languageModel: localizationController.languages[index],
+                    localizationController: localizationController,
+                    index: index,
+                  );
+                },
               ),
-            )),
+            ),
+          ),
 
-            ResponsiveHelper.isDesktop(context) ? const SizedBox.shrink() : LanguageSaveButton(localizationController: localizationController, fromMenu: widget.fromMenu),
-          ]);
-        }),
-      ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeDefault, horizontal: Dimensions.paddingSizeExtraLarge),
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.3), blurRadius: 10, spreadRadius: 0)],
+            ),
+            child: CustomButton(
+              buttonText: 'next'.tr,
+              onPressed: () {
+                if(localizationController.languages.isNotEmpty && localizationController.selectedLanguageIndex != -1) {
+                  localizationController.setLanguage(Locale(
+                    AppConstants.languages[localizationController.selectedLanguageIndex].languageCode!,
+                    AppConstants.languages[localizationController.selectedLanguageIndex].countryCode,
+                  ));
+                  if (widget.fromMenu) {
+                    Navigator.pop(context);
+                  } else {
+                    Get.offNamed(RouteHelper.getOnBoardingRoute());
+                  }
+                }else {
+                  showCustomSnackBar('select_a_language'.tr);
+                }
+              },
+            ),
+          ),
+
+        ]);
+      }),
+
     );
   }
 }
-
-class LanguageSaveButton extends StatelessWidget {
-  final LocalizationController localizationController;
-  final bool? fromMenu;
-  const LanguageSaveButton({super.key, required this.localizationController, this.fromMenu});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-      CustomButton(
-          buttonText: 'save'.tr,
-          margin: const EdgeInsets.all(Dimensions.paddingSizeSmall),
-          onPressed: () {
-            if(localizationController.languages.isNotEmpty && localizationController.selectedIndex != -1) {
-              localizationController.setLanguage(Locale(
-                AppConstants.languages[localizationController.selectedIndex].languageCode!,
-                AppConstants.languages[localizationController.selectedIndex].countryCode,
-              ));
-              if (fromMenu!) {
-                Navigator.pop(context);
-              } else {
-                Get.offNamed(RouteHelper.getOnBoardingRoute());
-              }
-            }else {
-              showCustomSnackBar('select_a_language'.tr);
-            }
-          },
-        ),
-    ]);
-  }
-}
-

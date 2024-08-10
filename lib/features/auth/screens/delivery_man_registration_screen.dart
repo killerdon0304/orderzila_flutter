@@ -253,6 +253,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                               nextFocus: _lNameNode,
                               prefixIcon: Icons.person,
                               required: true,
+                              labelTextSize: Dimensions.fontSizeSmall,
                               validator: (value) => ValidateCheck.validateEmptyText(value, null),
                             )),
                             const SizedBox(width: Dimensions.paddingSizeLarge),
@@ -267,6 +268,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                               nextFocus: _phoneNode,
                               prefixIcon: Icons.person,
                               required: true,
+                              labelTextSize: Dimensions.fontSizeSmall,
                               validator: (value) => ValidateCheck.validateEmptyText(value, null),
                             )),
                           ]),
@@ -439,7 +441,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                               padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
                             ),
                             items: vehicleList,
-                            child: Text('${deliverymanRegistrationController.vehicles != null ? deliverymanRegistrationController.vehicles![0].type : ''}'),
+                            child: Text('${(deliverymanRegistrationController.vehicles != null && deliverymanRegistrationController.vehicles!.isNotEmpty) ? deliverymanRegistrationController.vehicles![0].type : ''}'),
                           ),
                         ) : const CircularProgressIndicator(),
                         const SizedBox(height: Dimensions.paddingSizeExtraLarge),
@@ -588,6 +590,8 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
               child: SizedBox(
                 width: Dimensions.webMaxWidth,
                 child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  const SizedBox(height: Dimensions.paddingSizeLarge),
+
                   Container(
                     decoration: BoxDecoration(
                       color: Theme.of(context).cardColor,
@@ -659,6 +663,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                       Row(children: [
                         Expanded(child: CustomTextField(
                           titleText: 'first_name'.tr,
+                          showLabelText: false,
                           controller: _fNameController,
                           capitalization: TextCapitalization.words,
                           inputType: TextInputType.name,
@@ -671,6 +676,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
 
                         Expanded(child: CustomTextField(
                           titleText: 'last_name'.tr,
+                          showLabelText: false,
                           controller: _lNameController,
                           capitalization: TextCapitalization.words,
                           inputType: TextInputType.name,
@@ -684,6 +690,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                         Expanded(
                           child: CustomTextField(
                             titleText: 'phone'.tr,
+                            showLabelText: false,
                             controller: _phoneController,
                             focusNode: _phoneNode,
                             nextFocus: _emailNode,
@@ -703,6 +710,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Expanded(child:CustomTextField(
                           titleText: 'email'.tr,
+                          showLabelText: false,
                           controller: _emailController,
                           focusNode: _emailNode,
                           nextFocus: _passwordNode,
@@ -716,6 +724,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                           children: [
                             CustomTextField(
                               titleText: 'password'.tr,
+                              showLabelText: false,
                               controller: _passwordController,
                               focusNode: _passwordNode,
                               nextFocus: _identityNumberNode,
@@ -747,6 +756,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                         Expanded(child: CustomTextField(
                           titleText: 'confirm_password'.tr,
                           hintText: '8_character'.tr,
+                          showLabelText: false,
                           controller: _confirmPasswordController,
                           focusNode: _confirmPasswordNode,
                           inputAction: TextInputAction.done,
@@ -807,7 +817,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                                   padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
                                 ),
                                 items: typeList,
-                                child: Text('${deliverymanRegistrationController.dmTypeList[0]}'),
+                                child: Text('select_delivery_type'.tr),
                               ),
                             ),
                           ],
@@ -886,7 +896,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                                 items: vehicleList,
                                 child: Padding(
                                   padding: const EdgeInsets.only(left: 8),
-                                  child: Text(deliverymanRegistrationController.vehicles![deliverymanRegistrationController.vehicleIndex!].type!),
+                                  child: Text('${(deliverymanRegistrationController.vehicles != null && deliverymanRegistrationController.vehicles!.isNotEmpty) ? deliverymanRegistrationController.vehicles![0].type : ''}'),
                                 ),
                               ),
                             ) : const Center(child: CircularProgressIndicator()),
@@ -938,6 +948,7 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
                         Expanded(child: CustomTextField(
                           titleText: deliverymanRegistrationController.identityTypeIndex == 0 ? 'identity_number'.tr
                               : deliverymanRegistrationController.identityTypeIndex == 1 ? 'driving_license_number'.tr : 'nid_number'.tr,
+                          showLabelText: false,
                           controller: _identityNumberController,
                           focusNode: _identityNumberNode,
                           inputAction: TextInputAction.done,
@@ -1119,6 +1130,35 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
     String identityNumber = _identityNumberController.text.trim();
     String numberWithCountryCode = _countryDialCode!+phone;
 
+    if(!ResponsiveHelper.isDesktop(context)) {
+      if (_formKeyStep2!.currentState!.validate()) {
+        if (identityNumber.isEmpty) {
+          showCustomSnackBar('enter_delivery_man_identity_number'.tr);
+        } else if (deliverymanRegiController.pickedImage == null) {
+          showCustomSnackBar('upload_delivery_man_image'.tr);
+        } else if (deliverymanRegiController.vehicleIndex! == -1) {
+          showCustomSnackBar('please_select_vehicle_for_the_deliveryman'.tr);
+        } else if (deliverymanRegiController.pickedIdentities.isEmpty) {
+          showCustomSnackBar('please_upload_identity_image'.tr);
+        } else if (deliverymanRegiController.dmTypeIndex == 0) {
+          showCustomSnackBar('please_select_deliveryman_type'.tr);
+        } else {
+          deliverymanRegiController.registerDeliveryMan(DeliveryManBody(
+            fName: fName,
+            lName: lName,
+            password: password,
+            phone: numberWithCountryCode,
+            email: email,
+            identityNumber: identityNumber,
+            identityType: deliverymanRegiController.identityTypeList[deliverymanRegiController.identityTypeIndex],
+            earning: deliverymanRegiController.dmTypeIndex == 1 ? '1' : '0',
+            zoneId: deliverymanRegiController.zoneList![deliverymanRegiController.selectedZoneIndex!].id.toString(),
+            vehicleId: deliverymanRegiController.vehicles![deliverymanRegiController.vehicleIndex!].id.toString(),
+          ));
+        }
+      }
+    }
+
     if(ResponsiveHelper.isDesktop(context)) {
       PhoneValid phoneValid = await CustomValidator.isPhoneValid(numberWithCountryCode);
       numberWithCountryCode = phoneValid.phone;
@@ -1150,20 +1190,21 @@ class _DeliveryManRegistrationScreenState extends State<DeliveryManRegistrationS
       }else if(!deliverymanRegiController.spatialCheck || !deliverymanRegiController.lowercaseCheck || !deliverymanRegiController.uppercaseCheck || !deliverymanRegiController.numberCheck || !deliverymanRegiController.lengthCheck) {
         showCustomSnackBar('provide_valid_password'.tr);
         return;
-      }
-    }
-
-    if(_formKeyStep2!.currentState!.validate()) {
-      if(identityNumber.isEmpty) {
+      }else if(identityNumber.isEmpty) {
         showCustomSnackBar('enter_delivery_man_identity_number'.tr);
+        return;
       }else if(deliverymanRegiController.pickedImage == null) {
         showCustomSnackBar('upload_delivery_man_image'.tr);
+        return;
       }else if(deliverymanRegiController.vehicleIndex! == -1) {
         showCustomSnackBar('please_select_vehicle_for_the_deliveryman'.tr);
+        return;
       }else if(deliverymanRegiController.pickedIdentities.isEmpty) {
         showCustomSnackBar('please_upload_identity_image'.tr);
+        return;
       }else if(deliverymanRegiController.dmTypeIndex == 0) {
         showCustomSnackBar('please_select_deliveryman_type'.tr);
+        return;
       }else {
         deliverymanRegiController.registerDeliveryMan(DeliveryManBody(
           fName: fName, lName: lName, password: password, phone: numberWithCountryCode, email: email,

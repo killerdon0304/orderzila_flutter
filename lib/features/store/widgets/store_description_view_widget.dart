@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:sixam_mart/features/store/controllers/store_controller.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/favourite/controllers/favourite_controller.dart';
@@ -8,6 +7,7 @@ import 'package:sixam_mart/helper/auth_helper.dart';
 import 'package:sixam_mart/helper/price_converter.dart';
 import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -15,7 +15,6 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:universal_html/html.dart' as html;
 
 class StoreDescriptionViewWidget extends StatelessWidget {
   final Store? store;
@@ -84,7 +83,7 @@ class StoreDescriptionViewWidget extends StatelessWidget {
                 onTap: () {
                   if(AuthHelper.isLoggedIn()) {
                     isWished ? favouriteController.removeFromFavouriteList(store!.id, true)
-                        : favouriteController.addToFavouriteList(null, store, true);
+                        : favouriteController.addToFavouriteList(null, store?.id, true);
                   }else {
                     showCustomSnackBar('you_are_not_logged_in'.tr);
                   }
@@ -118,14 +117,9 @@ class StoreDescriptionViewWidget extends StatelessWidget {
               ),
             ),
 
-            InkWell(
+            AppConstants.webHostedUrl.isNotEmpty ? InkWell(
               onTap: () {
-                String? hostname = html.window.location.hostname;
-                String protocol = html.window.location.protocol;
-                String shareUrl = '$protocol//$hostname${Get.find<StoreController>().filteringUrl(store!.slug ?? '')}';
-
-                Clipboard.setData(ClipboardData(text: shareUrl));
-                showCustomSnackBar('store_url_copied'.tr, isError: false);
+                Get.find<StoreController>().shareStore();
               },
               child: Container(
                 decoration: BoxDecoration(
@@ -135,7 +129,7 @@ class StoreDescriptionViewWidget extends StatelessWidget {
                 padding: const EdgeInsets.all(Dimensions.paddingSizeExtraSmall),
                 child: const Icon(Icons.share, size: 24, color: Colors.white),
               ),
-            ),
+            ) : const SizedBox(),
           ]),
           SizedBox(height: ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeSmall : 0),
 
@@ -185,7 +179,8 @@ class StoreDescriptionViewWidget extends StatelessWidget {
            onTap: () => Get.toNamed(RouteHelper.getMapRoute(
                AddressModel(id: store!.id, address: store!.address, latitude: store!.latitude,
                  longitude: store!.longitude, contactPersonNumber: '', contactPersonName: '', addressType: '',
-               ), 'store', Get.find<SplashController>().getModuleConfig(Get.find<SplashController>().module!.moduleType!).newVariation!
+               ), 'store', Get.find<SplashController>().getModuleConfig(Get.find<SplashController>().module!.moduleType!).newVariation!,
+             storeName: store!.name,
            )),
            child: Column(children: [
              // Icon(Icons.location_on, color: Theme.of(context).primaryColor, size: 20),
@@ -244,7 +239,8 @@ class StoreDescriptionViewWidget extends StatelessWidget {
          onTap: () => Get.toNamed(RouteHelper.getMapRoute(
            AddressModel(id: store!.id, address: store!.address, latitude: store!.latitude,
              longitude: store!.longitude, contactPersonNumber: '', contactPersonName: '', addressType: '',
-           ), 'store', Get.find<SplashController>().getModuleConfig(Get.find<SplashController>().module!.moduleType!).newVariation!
+           ), 'store', Get.find<SplashController>().getModuleConfig(Get.find<SplashController>().module!.moduleType!).newVariation!,
+           storeName: store!.name,
          )),
          child: Column(children: [
            Icon(Icons.location_on, color: Theme.of(context).primaryColor, size: 20),

@@ -40,7 +40,10 @@ class NotificationHelper {
             }
           } else if(payload.notificationType == NotificationType.general) {
             Get.offAllNamed(RouteHelper.getNotificationRoute(fromNotification: true));
-          } else{
+          }else if(payload.notificationType == NotificationType.otp || payload.notificationType == NotificationType.block || payload.notificationType == NotificationType.unblock) {
+          }else if(payload.notificationType == NotificationType.add_fund){
+            Get.offAllNamed(RouteHelper.getWalletRoute());
+          }else{
             Get.offAllNamed(RouteHelper.getChatRoute(notificationBody: payload, conversationID: payload.conversationId, fromNotification: true));
           }
         }
@@ -117,7 +120,10 @@ class NotificationHelper {
             Get.offAllNamed(RouteHelper.getOrderDetailsRoute(int.parse(message.data['order_id']), fromNotification: true));
           } else if(notificationBody.notificationType == NotificationType.general) {
             Get.offAllNamed(RouteHelper.getNotificationRoute(fromNotification: true));
-          } else{
+          } else if(notificationBody.notificationType == NotificationType.otp || notificationBody.notificationType == NotificationType.block || notificationBody.notificationType == NotificationType.unblock) {
+          }else if(notificationBody.notificationType == NotificationType.add_fund){
+            Get.offAllNamed(RouteHelper.getWalletRoute());
+          }else{
             Get.offAllNamed(RouteHelper.getChatRoute(notificationBody: notificationBody, conversationID: notificationBody.conversationId, fromNotification: true));
           }
         }
@@ -153,7 +159,7 @@ class NotificationHelper {
 
   static Future<void> showTextNotification(String title, String body, String orderID, NotificationBodyModel? notificationBody, FlutterLocalNotificationsPlugin fln) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'orderzila', 'orderzila', playSound: true,
+      '6ammart', '6ammart', playSound: true,
       importance: Importance.max, priority: Priority.max, sound: RawResourceAndroidNotificationSound('notification'),
     );
     const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
@@ -166,7 +172,7 @@ class NotificationHelper {
       contentTitle: title, htmlFormatContentTitle: true,
     );
     AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'orderzila', 'orderzila', importance: Importance.max,
+      '6ammart', '6ammart', importance: Importance.max,
       styleInformation: bigTextStyleInformation, priority: Priority.max, playSound: true,
       sound: const RawResourceAndroidNotificationSound('notification'),
     );
@@ -183,7 +189,7 @@ class NotificationHelper {
       summaryText: body, htmlFormatSummaryText: true,
     );
     final AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'orderzila', 'orderzila',
+      '6ammart', '6ammart',
       largeIcon: FilePathAndroidBitmap(largeIconPath), priority: Priority.max, playSound: true,
       styleInformation: bigPictureStyleInformation, importance: Importance.max,
       sound: const RawResourceAndroidNotificationSound('notification'),
@@ -202,8 +208,16 @@ class NotificationHelper {
   }
 
   static NotificationBodyModel convertNotification(Map<String, dynamic> data){
-    if(data['type'] == 'general' || data['type'] == 'referral_code') {
+    if(data['type'] == 'general' || data['type'] == 'referral_code' || data['type'] == 'referral_earn' || data['type'] == 'cashback') {
       return NotificationBodyModel(notificationType: NotificationType.general);
+    }else if(data['type'] == 'otp') {
+      return NotificationBodyModel(notificationType: NotificationType.otp);
+    }else if(data['type'] == 'add_fund') {
+      return NotificationBodyModel(notificationType: NotificationType.add_fund);
+    }else if(data['type'] == 'block'){
+      return NotificationBodyModel(notificationType: NotificationType.block);
+    }else if(data['type'] == 'unblock'){
+      return NotificationBodyModel(notificationType: NotificationType.unblock);
     }else if(data['type'] == 'order_status') {
       return NotificationBodyModel(notificationType: NotificationType.order, orderId: int.parse(data['order_id']));
     }else {

@@ -7,4 +7,6 @@ abstract class LanguageRepositoryInterface extends RepositoryInterface {
   void updateHeader(AddressModel? addressModel, Locale locale, int? moduleId);
   Locale getLocaleFromSharedPref();
   void saveLanguage(Locale locale);
+  void saveCacheLanguage(Locale locale);
+  Locale getCacheLocaleFromSharedPref();
 }

@@ -180,7 +180,7 @@ class CartService implements CartServiceInterface {
   }
 
   @override
-  int decideItemQuantity(bool isIncrement, List<CartModel> cartList, int cartIndex, int? stock, int ? quantityLimit, bool moduleStock) {
+  Future<int> decideItemQuantity(bool isIncrement, List<CartModel> cartList, int cartIndex, int? stock, int ? quantityLimit, bool moduleStock) async{
     int quantity = cartList[cartIndex].quantity!;
     if (isIncrement) {
       if(moduleStock && cartList[cartIndex].quantity! >= stock!) {
@@ -201,7 +201,7 @@ class CartService implements CartServiceInterface {
   }
 
   @override
-  double calculateDiscountedPrice(CartModel cartModel, int quantity, bool isFoodVariation) {
+  Future<double> calculateDiscountedPrice(CartModel cartModel, int quantity, bool isFoodVariation) async{
     double? discount = cartModel.item!.storeDiscount == 0 ? cartModel.item!.discount : cartModel.item!.storeDiscount;
     String? discountType = cartModel.item!.storeDiscount == 0 ? cartModel.item!.discountType : 'percent';
     double variationPrice = 0;

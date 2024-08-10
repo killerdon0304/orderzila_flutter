@@ -5,6 +5,7 @@ class SignUpBodyModel {
   String? email;
   String? password;
   String? refCode;
+  String? deviceToken;
 
   SignUpBodyModel({
     this.fName,
@@ -13,6 +14,7 @@ class SignUpBodyModel {
     this.email = '',
     this.password,
     this.refCode = '',
+    this.deviceToken,
   });
 
   SignUpBodyModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class SignUpBodyModel {
     email = json['email'];
     password = json['password'];
     refCode = json['ref_code'];
+    deviceToken = json['cm_firebase_token'];
   }
 
   Map<String, dynamic> toJson() {
@@ -32,6 +35,7 @@ class SignUpBodyModel {
     data['email'] = email;
     data['password'] = password;
     data['ref_code'] = refCode;
+    data['cm_firebase_token'] = deviceToken;
     return data;
   }
 }

@@ -2,6 +2,8 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sixam_mart/api/api_client.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+import 'package:sixam_mart/features/search/domain/models/popular_categories_model.dart';
+import 'package:sixam_mart/features/search/domain/models/search_suggestion_model.dart';
 import 'package:sixam_mart/features/search/domain/repositories/search_repository_interface.dart';
 import 'package:sixam_mart/util/app_constants.dart';
 
@@ -66,6 +68,29 @@ class SearchRepository implements SearchRepositoryInterface {
   @override
   Future update(Map<String, dynamic> body, int? id) {
     throw UnimplementedError();
+  }
+
+  @override
+  Future<SearchSuggestionModel?> getSearchSuggestions(String searchText) async {
+    SearchSuggestionModel? searchSuggestionModel;
+    Response response = await apiClient.getData('${AppConstants.searchSuggestionsUri}?name=$searchText');
+    if(response.statusCode == 200) {
+      searchSuggestionModel = SearchSuggestionModel.fromJson(response.body);
+    }
+    return searchSuggestionModel;
+  }
+
+  @override
+  Future<List<PopularCategoryModel?>?> getPopularCategories() async {
+    List<PopularCategoryModel?>? popularCategoryList;
+    Response response = await apiClient.getData(AppConstants.searchPopularCategoriesUri);
+    if(response.statusCode == 200) {
+      popularCategoryList = [];
+      response.body.forEach((category) {
+        popularCategoryList!.add(PopularCategoryModel.fromJson(category));
+      });
+    }
+    return popularCategoryList;
   }
 
 }

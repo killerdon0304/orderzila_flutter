@@ -25,7 +25,7 @@
     </queries>
 
     <application
-        android:label="orderzila"
+        android:label="6amMart"
         android:name="${applicationName}"
         android:requestLegacyExternalStorage="true"
         android:usesCleartextTraffic="true"
@@ -61,7 +61,7 @@
 
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
-                android:value="orderzila" />
+                android:value="6ammart" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/checkout/controllers/checkout_controller.dart';
-import 'package:sixam_mart/helper/responsive_helper.dart';
 import 'package:sixam_mart/helper/route_helper.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -42,14 +41,17 @@ class GuestDeliveryAddress extends StatelessWidget {
 
           takeAway ? const SizedBox() : InkWell(
             onTap: () async {
+              String? previousGuestAddress = checkoutController.guestAddress?.address;
               var address = await Get.toNamed(RouteHelper.getEditAddressRoute(checkoutController.guestAddress, fromGuest: true));
 
               if(address != null) {
                 checkoutController.setGuestAddress(address);
-                checkoutController.getDistanceInKM(
-                  LatLng(double.parse(address.latitude), double.parse(address.longitude)),
-                  LatLng(double.parse(checkoutController.store!.latitude!), double.parse(checkoutController.store!.longitude!)),
-                );
+                if(previousGuestAddress != address.address) {
+                  checkoutController.getDistanceInKM(
+                    LatLng(double.parse(address.latitude), double.parse(address.longitude)),
+                    LatLng(double.parse(checkoutController.store!.latitude!), double.parse(checkoutController.store!.longitude!)),
+                  );
+                }
               }
             },
             child: Image.asset(Images.editDelivery, height: 20, width: 20, color: Theme.of(context).primaryColor),
@@ -64,9 +66,8 @@ class GuestDeliveryAddress extends StatelessWidget {
         takeAway ? Column(children: [
           const SizedBox(height: Dimensions.paddingSizeLarge),
           CustomTextField(
-            showTitle: ResponsiveHelper.isDesktop(context),
-            titleText: 'contact_person_name'.tr,
-            hintText: ' ',
+            labelText: 'contact_person_name'.tr,
+            titleText: 'write_name'.tr,
             inputType: TextInputType.name,
             controller: guestNameTextEditingController,
             nextFocus: guestNumberNode,
@@ -75,9 +76,8 @@ class GuestDeliveryAddress extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           CustomTextField(
-            showTitle: ResponsiveHelper.isDesktop(context),
-            titleText: 'contact_person_number'.tr,
-            hintText: ' ',
+            labelText: 'contact_person_number'.tr,
+            titleText: 'write_number'.tr,
             controller: guestNumberTextEditingController,
             focusNode: guestNumberNode,
             nextFocus: guestEmailNode,
@@ -91,8 +91,8 @@ class GuestDeliveryAddress extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeLarge),
 
           CustomTextField(
-            titleText: 'email'.tr,
-            hintText: 'enter_email'.tr,
+            titleText: 'enter_email'.tr,
+            labelText: 'email'.tr,
             controller: guestEmailController,
             focusNode: guestEmailNode,
             inputAction: TextInputAction.done,
@@ -127,13 +127,13 @@ class GuestDeliveryAddress extends StatelessWidget {
           const SizedBox(height: Dimensions.paddingSizeSmall),
 
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: Column(children: [
+            Expanded(flex: 6, child: Column(children: [
               addressInfo('address_type'.tr, checkoutController.guestAddress!.addressType!),
               addressInfo('name'.tr, checkoutController.guestAddress!.contactPersonName!),
               addressInfo('phone'.tr, checkoutController.guestAddress!.contactPersonNumber!),
               addressInfo('email'.tr, checkoutController.guestAddress!.email!),
             ])),
-            Expanded(child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Expanded(flex: 4, child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
               addressInfo('street'.tr, checkoutController.guestAddress!.streetNumber!),
               addressInfo('house'.tr, checkoutController.guestAddress!.house!),
               addressInfo('floor'.tr, checkoutController.guestAddress!.floor!),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sixam_mart/features/language/controllers/language_controller.dart';
 import 'package:sixam_mart/features/parcel/controllers/parcel_controller.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/styles.dart';
@@ -30,24 +32,29 @@ class ServiceInfoListWidget extends StatelessWidget {
       itemBuilder: (context, index) {
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
-          Row(children: [
-            Container(
-              height: 14, width: 14,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Theme.of(context).primaryColor,
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Row(children: [
+              Container(
+                height: 14, width: 14,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
-            ),
-            const SizedBox(width: Dimensions.paddingSizeDefault),
+              const SizedBox(width: Dimensions.paddingSizeDefault),
 
-            Flexible(child: Text(title![index], style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis)),
-          ]),
+              Flexible(child: Text(title![index], style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis)),
+            ]),
+          ),
 
           Container(
             padding: const EdgeInsets.symmetric(vertical: Dimensions.paddingSizeSmall, horizontal: 22.5),
-            margin: const EdgeInsets.only(left: 7),
+            margin: EdgeInsets.only(left: Get.find<LocalizationController>().isLtr ? 15 : 0, right: Get.find<LocalizationController>().isLtr ? 0 : 7),
             decoration: BoxDecoration(
-              border: index == title.length - 1 ? null : Border(left: BorderSide(width: 1, color: Theme.of(context).disabledColor))),
+              border: index == title.length - 1 ? null : Border(left: Get.find<LocalizationController>().isLtr ? BorderSide(width: 1, color: Theme.of(context).disabledColor)
+                  : BorderSide.none, right: Get.find<LocalizationController>().isLtr ? BorderSide.none : BorderSide(width: 1, color: Theme.of(context).disabledColor)),
+            ),
             child: Text(
               subTitle![index],
               style: robotoRegular.copyWith(color: Theme.of(context).disabledColor),

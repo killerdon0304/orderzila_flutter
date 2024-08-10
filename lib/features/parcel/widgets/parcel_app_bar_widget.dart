@@ -17,7 +17,7 @@ class ParcelAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: Theme.of(context).primaryColor,
+      backgroundColor: Theme.of(context).cardColor,
       shape: Border(
         bottom: BorderSide(
         width: .4,
@@ -29,7 +29,7 @@ class ParcelAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
           return Row(children: [
             (splashController.module != null && splashController.configModel!.module == null) ? InkWell(
               onTap: () => splashController.removeModule(),
-              child: Image.asset(Images.moduleIcon, height: 25, width: 25, color: Theme.of(context).cardColor),
+              child: Image.asset(Images.moduleIcon, height: 25, width: 25, color: Theme.of(context).textTheme.bodyLarge!.color),
             ) : const SizedBox(),
             SizedBox(width: (splashController.module != null && splashController.configModel!.module
                 == null) ? Dimensions.paddingSizeSmall : 0),
@@ -45,7 +45,7 @@ class ParcelAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
                     Text(
                       AddressHelper.getUserAddressFromSharedPref()!.addressType!.tr,
                       style: robotoMedium.copyWith(
-                        color: Theme.of(context).cardColor, fontSize: Dimensions.fontSizeDefault,
+                        color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeDefault,
                       ),
                       maxLines: 1, overflow: TextOverflow.ellipsis,
                     ),
@@ -55,13 +55,13 @@ class ParcelAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
                         child: Text(
                           AddressHelper.getUserAddressFromSharedPref()!.address!,
                           style: robotoRegular.copyWith(
-                            color: Theme.of(context).cardColor, fontSize: Dimensions.fontSizeSmall,
+                            color: Theme.of(context).textTheme.bodyLarge!.color, fontSize: Dimensions.fontSizeSmall,
                           ),
                           maxLines: 1, overflow: TextOverflow.ellipsis,
                         ),
                       ),
 
-                      Icon(Icons.expand_more, color: Theme.of(context).cardColor, size: 18,),
+                      Icon(Icons.expand_more, color: Theme.of(context).textTheme.bodyLarge!.color, size: 18),
 
                     ]),
 
@@ -72,7 +72,7 @@ class ParcelAppBarWidget extends StatelessWidget implements PreferredSizeWidget 
             InkWell(
               child: GetBuilder<NotificationController>(builder: (notificationController) {
                 return Stack(children: [
-                  Icon(CupertinoIcons.bell, size: 25, color: Theme.of(context).cardColor),
+                  Icon(CupertinoIcons.bell, size: 25, color: Theme.of(context).textTheme.bodyLarge!.color),
                   notificationController.hasNotification ? Positioned(top: 0, right: 0, child: Container(
                     height: 10, width: 10, decoration: BoxDecoration(
                     color: Theme.of(context).primaryColor, shape: BoxShape.circle,

@@ -31,8 +31,9 @@ class SocialLoginWidget extends StatelessWidget {
           onTap: () async {
             GoogleSignInAccount googleAccount = (await googleSignIn.signIn())!;
             GoogleSignInAuthentication auth = await googleAccount.authentication;
+            String? deviceToken = await Get.find<AuthController>().saveDeviceToken();
            Get.find<AuthController>().loginWithSocialMedia(SocialLogInBody(
-              email: googleAccount.email, token: auth.accessToken, uniqueId: googleAccount.id, medium: 'google',
+              email: googleAccount.email, token: auth.accessToken, uniqueId: googleAccount.id, medium: 'google', deviceToken: deviceToken,
             ));
           },
           child: Container(
@@ -54,8 +55,9 @@ class SocialLoginWidget extends StatelessWidget {
             LoginResult result = await FacebookAuth.instance.login(loginBehavior: LoginBehavior.webOnly);
             if (result.status == LoginStatus.success) {
               Map userData = await FacebookAuth.instance.getUserData();
+              String? deviceToken = await Get.find<AuthController>().saveDeviceToken();
               Get.find<AuthController>().loginWithSocialMedia(SocialLogInBody(
-                email: userData['email'], token: result.accessToken!.token, uniqueId: result.accessToken!.userId, medium: 'facebook',
+                email: userData['email'], token: result.accessToken!.token, uniqueId: result.accessToken!.userId, medium: 'facebook', deviceToken: deviceToken,
               ));
             }
           },
@@ -81,11 +83,12 @@ class SocialLoginWidget extends StatelessWidget {
             ],
               webAuthenticationOptions: WebAuthenticationOptions(
                 clientId: Get.find<SplashController>().configModel!.appleLogin![0].clientId!,
-                redirectUri: Uri.parse('https://orderzila-web.6amtech.com/apple'),
+                redirectUri: Uri.parse('https://6ammart-web.6amtech.com/apple'),
               ),
             );
+            String? deviceToken = await Get.find<AuthController>().saveDeviceToken();
             Get.find<AuthController>().loginWithSocialMedia(SocialLogInBody(
-                email: credential.email, token: credential.authorizationCode, uniqueId: credential.authorizationCode, medium: 'apple',
+                email: credential.email, token: credential.authorizationCode, uniqueId: credential.authorizationCode, medium: 'apple', deviceToken: deviceToken,
             ));
           },
           child: Container(

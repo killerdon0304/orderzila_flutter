@@ -8,7 +8,8 @@ import 'package:sixam_mart/common/widgets/custom_snackbar.dart';
 
 class CancellationDialogueWidget extends StatelessWidget {
   final int? orderId;
-  const CancellationDialogueWidget({super.key, required this.orderId});
+  final String? contactNumber;
+  const CancellationDialogueWidget({super.key, required this.orderId, this.contactNumber});
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +79,7 @@ class CancellationDialogueWidget extends StatelessWidget {
 
                         orderController.cancelOrder(orderId, orderController.cancelReason).then((success) {
                           if(success){
-                            orderController.trackOrder(orderId.toString(), null, true);
+                            orderController.trackOrder(orderId.toString(), null, true, contactNumber: contactNumber);
                           }
                         });
 

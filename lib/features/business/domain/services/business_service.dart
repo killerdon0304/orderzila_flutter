@@ -22,41 +22,42 @@ class BusinessService implements BusinessServiceInterface{
   }
 
   @override
-  Future<String> processesBusinessPlan(String businessPlanStatus, int paymentIndex, int storeId, PackageModel? packageModel, String? digitalPaymentName, int? selectedPackageId) async {
-    if (packageModel!.packages!.isNotEmpty) {
+  Future<String> processesBusinessPlan(String businessPlanStatus, int paymentIndex, int storeId, String? digitalPaymentName, int? selectedPackageId) async {
+    // if (packageModel!.packages!.isNotEmpty) {
+    //
+    //
+    //
+    // } else if(packageModel.packages!.isEmpty && packageModel.packages!.isEmpty){
+    //   showCustomSnackBar('no_package_found'.tr);
+    // } else {
+    //   showCustomSnackBar('please Select Any Process');
+    // }
+    String businessPlan = 'subscription';
+    int? packageId = selectedPackageId;
+    String? payment = paymentIndex == 0 ? 'free_trial' : digitalPaymentName;
+    String? hostname = html.window.location.hostname;
+    String protocol = html.window.location.protocol;
 
-      String businessPlan = 'subscription';
-      int? packageId = selectedPackageId;
-      String? payment = paymentIndex == 0 ? 'free_trial' : digitalPaymentName;
-      String? hostname = html.window.location.hostname;
-      String protocol = html.window.location.protocol;
-
-      if(paymentIndex == 1 && digitalPaymentName == null) {
-        if(ResponsiveHelper.isDesktop(Get.context)) {
-          Get.dialog(const Dialog(backgroundColor: Colors.transparent, child: BusinessPaymentMethodBottomSheetWidget()));
-        } else {
-          showCustomSnackBar('please_select_payment_method'.tr);
-        }
+    if(paymentIndex == 1 && digitalPaymentName == null) {
+      if(ResponsiveHelper.isDesktop(Get.context)) {
+        Get.dialog(const Dialog(backgroundColor: Colors.transparent, child: BusinessPaymentMethodBottomSheetWidget()));
       } else {
-        businessPlanStatus = await setUpBusinessPlan(
-          BusinessPlanBody(
-            businessPlan: businessPlan,
-            packageId: packageId.toString(),
-            storeId: storeId.toString(),
-            payment: payment,
-            paymentGateway: payment,
-            callBack: paymentIndex == 0 ? '' : ResponsiveHelper.isDesktop(Get.context) ? '$protocol//$hostname${RouteHelper.subscriptionSuccess}' : RouteHelper.subscriptionSuccess,
-            paymentPlatform: GetPlatform.isWeb ? 'web' : 'app',
-            type: 'new_join',
-          ),
-          digitalPaymentName, businessPlanStatus, storeId,
-        );
+        showCustomSnackBar('please_select_payment_method'.tr);
       }
-
-    } else if(packageModel.packages!.isEmpty && packageModel.packages!.isEmpty){
-      showCustomSnackBar('no_package_found'.tr);
     } else {
-      showCustomSnackBar('please Select Any Process');
+      businessPlanStatus = await setUpBusinessPlan(
+        BusinessPlanBody(
+          businessPlan: businessPlan,
+          packageId: packageId.toString(),
+          storeId: storeId.toString(),
+          payment: payment,
+          paymentGateway: payment,
+          callBack: paymentIndex == 0 ? '' : ResponsiveHelper.isDesktop(Get.context) ? '$protocol//$hostname${RouteHelper.subscriptionSuccess}' : RouteHelper.subscriptionSuccess,
+          paymentPlatform: GetPlatform.isWeb ? 'web' : 'app',
+          type: 'new_join',
+        ),
+        digitalPaymentName, businessPlanStatus, storeId,
+      );
     }
     return businessPlanStatus;
   }

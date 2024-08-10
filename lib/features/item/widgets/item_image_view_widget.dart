@@ -9,7 +9,8 @@ import 'package:sixam_mart/common/widgets/custom_image.dart';
 
 class ItemImageViewWidget extends StatelessWidget {
   final Item? item;
-  ItemImageViewWidget({super.key, required this.item});
+  final bool isCampaign;
+  ItemImageViewWidget({super.key, required this.item, this.isCampaign = false});
 
   final PageController _controller = PageController();
 
@@ -17,29 +18,36 @@ class ItemImageViewWidget extends StatelessWidget {
   Widget build(BuildContext context) {
 
     List<String?> imageList = [];
-    imageList.add(item!.imageFullUrl);
-    imageList.addAll(item!.imagesFullUrl!);
+    List<String?> imageListForCampaign = [];
+
+    if(isCampaign){
+      imageListForCampaign.add(item!.imageFullUrl);
+    }else{
+      imageList.add(item!.imageFullUrl);
+      imageList.addAll(item!.imagesFullUrl!);
+    }
 
     return GetBuilder<ItemController>(builder: (itemController) {
 
       return Column(mainAxisSize: MainAxisSize.min, children: [
 
           InkWell(
-            onTap: () => Navigator.of(context).pushNamed(
-              RouteHelper.getItemImagesRoute(item!),
-              arguments: ItemImageViewWidget(item: item),
-            ),
+            onTap: isCampaign ? null : () {
+              if(!isCampaign) {
+                Navigator.of(context).pushNamed(RouteHelper.getItemImagesRoute(item!), arguments: ItemImageViewWidget(item: item));
+              }
+            },
             child: Stack(children: [
               SizedBox(
                 height: ResponsiveHelper.isDesktop(context)? 350: MediaQuery.of(context).size.width * 0.7,
                 child: PageView.builder(
                   controller: _controller,
-                  itemCount: imageList.length,
+                  itemCount: isCampaign ? imageListForCampaign.length : imageList.length,
                   itemBuilder: (context, index) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(10),
                       child: CustomImage(
-                        image: '${imageList[index]}',
+                        image: '${isCampaign ? imageListForCampaign[index] : imageList[index]}',
                         height: 200,
                         width: MediaQuery.of(context).size.width,
                       ),
@@ -56,7 +64,7 @@ class ItemImageViewWidget extends StatelessWidget {
                   padding: const EdgeInsets.only(bottom: Dimensions.paddingSizeSmall),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: _indicators(context, itemController, imageList),
+                    children: _indicators(context, itemController, isCampaign ? imageListForCampaign : imageList),
                   ),
                 ),
               ),

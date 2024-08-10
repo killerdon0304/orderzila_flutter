@@ -20,7 +20,9 @@ class CouponSection extends StatelessWidget {
   final double discount;
   final double addOns;
   final double deliveryCharge;
-  const CouponSection({super.key, this.storeId, required this.checkoutController, required this.total, required this.price, required this.discount, required this.addOns, required this.deliveryCharge, });
+  final double variationPrice;
+  const CouponSection({super.key, this.storeId, required this.checkoutController, required this.total, required this.price, required this.discount,
+    required this.addOns, required this.deliveryCharge, required this.variationPrice});
 
   @override
   Widget build(BuildContext context) {
@@ -41,49 +43,12 @@ class CouponSection extends StatelessWidget {
                 onTap: () {
 
                   if(ResponsiveHelper.isDesktop(context)){
-                    Get.dialog(Dialog(child: CouponBottomSheet(storeId: Get.find<StoreController>().store!.id))).then((value) {
-                      if(value != null) {
-                        checkoutController.couponController.text = value.toString();
-                      }
-                    });
+                    Get.dialog(Dialog(child: CouponBottomSheet(storeId: Get.find<StoreController>().store!.id, checkoutController: checkoutController)));
                   }else{
                     showModalBottomSheet(
                       context: context, isScrollControlled: true, backgroundColor: Colors.transparent,
-                      builder: (con) => CouponBottomSheet(storeId: Get.find<StoreController>().store!.id),
-                    ).then((value) async {
-                      if(value != null){
-                        if(value != null) {
-                          checkoutController.couponController.text = value.toString();
-                        }
-                        if(checkoutController.couponController.text.isNotEmpty){
-                          if(Get.find<CouponController>().discount! < 1 && !Get.find<CouponController>().freeDelivery) {
-                            if(checkoutController.couponController.text.isNotEmpty && !Get.find<CouponController>().isLoading) {
-                              Get.find<CouponController>().applyCoupon(checkoutController.couponController.text, (price-discount)+addOns, deliveryCharge,
-                                  Get.find<StoreController>().store!.id).then((discount) {
-                                checkoutController.couponController.text = 'coupon_applied'.tr;
-                                if (discount! > 0) {
-                                  showCustomSnackBar(
-                                    '${'you_got_discount_of'.tr} ${PriceConverter.convertPrice(discount)}',
-                                    isError: false,
-                                  );
-                                  if(checkoutController.isPartialPay || checkoutController.paymentMethodIndex == 1) {
-                                    totalPrice = totalPrice - discount;
-                                    checkoutController.checkBalanceStatus(totalPrice, 0);
-                                  }
-                                }
-                              });
-                            } else if(checkoutController.couponController.text.isEmpty) {
-                              showCustomSnackBar('enter_a_coupon_code'.tr);
-                            }
-                          } else {
-                            Get.find<CouponController>().removeCouponData(true);
-                            checkoutController.couponController.text = '';
-                          }
-                        }
-
-                      }
-
-                    });
+                      builder: (con) => CouponBottomSheet(storeId: Get.find<StoreController>().store!.id, checkoutController: checkoutController),
+                    );
                   }
                 },
                 child: Padding(
@@ -138,9 +103,9 @@ class CouponSection extends StatelessWidget {
                     if(checkoutController.couponController.text.isNotEmpty){
                       if(Get.find<CouponController>().discount! < 1 && !Get.find<CouponController>().freeDelivery) {
                         if(checkoutController.couponController.text.isNotEmpty && !Get.find<CouponController>().isLoading) {
-                          Get.find<CouponController>().applyCoupon(checkoutController.couponController.text, (price-discount)+addOns, deliveryCharge,
+                          Get.find<CouponController>().applyCoupon(checkoutController.couponController.text, (price-discount)+addOns + variationPrice, deliveryCharge,
                               Get.find<StoreController>().store!.id).then((discount) {
-                            checkoutController.couponController.text = 'coupon_applied'.tr;
+                            //checkoutController.couponController.text = 'coupon_applied'.tr;
                             if (discount! > 0) {
                               showCustomSnackBar(
                                 '${'you_got_discount_of'.tr} ${PriceConverter.convertPrice(discount)}',
@@ -163,6 +128,8 @@ class CouponSection extends StatelessWidget {
                           checkoutController.checkBalanceStatus(totalPrice, 0);
                         }
                       }
+                    }else {
+                      showCustomSnackBar('enter_a_coupon_code'.tr);
                     }
                   },
                   child: Container(

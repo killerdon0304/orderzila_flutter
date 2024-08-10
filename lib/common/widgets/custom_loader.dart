@@ -1,8 +1,8 @@
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:flutter/material.dart';
 
-class CustomLoader extends StatelessWidget {
-  const CustomLoader({super.key});
+class CustomLoaderWidget extends StatelessWidget {
+  const CustomLoaderWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,4 @@
+import 'package:sixam_mart/features/profile/widgets/notification_status_change_bottom_sheet.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -91,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Expanded(
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                               Text(
-                                isLoggedIn ? '${profileController.userInfoModel!.fName} ${profileController.userInfoModel!.lName}' : 'guest_user'.tr,
+                                isLoggedIn ? '${profileController.userInfoModel?.fName} ${profileController.userInfoModel?.lName ?? ''}' : 'guest_user'.tr,
                                 style: robotoBold.copyWith(fontSize: Dimensions.fontSizeExtraLarge),
                               ),
                               const SizedBox(height: Dimensions.paddingSizeExtraSmall),
@@ -203,7 +204,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               return ProfileButtonWidget(
                                 icon: Icons.notifications, title: 'notification'.tr,
                                 isButtonActive: authController.notification, onTap: () {
-                                authController.setNotificationActive(!authController.notification);
+                                Get.bottomSheet(const NotificationStatusChangeBottomSheet());
+                                // authController.setNotificationActive(!authController.notification);
                               },
                               );
                             }) : const SizedBox(),

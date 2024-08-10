@@ -35,7 +35,7 @@ class LoyaltyCardWidget extends StatelessWidget {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
 
                   ResponsiveHelper.isDesktop(context) ? const SizedBox() : Text(
-                    '${'loyalty_points'.tr} !',
+                    '${'convertible_points'.tr} !',
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color),
                   ),
 
@@ -45,7 +45,7 @@ class LoyaltyCardWidget extends StatelessWidget {
                   ),
 
                   ResponsiveHelper.isDesktop(context) ? Text(
-                    '${'loyalty_points'.tr} !',
+                    '${'convertible_points'.tr} !',
                     style: robotoRegular.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).textTheme.bodyLarge!.color),
                   ) : const SizedBox(),
 

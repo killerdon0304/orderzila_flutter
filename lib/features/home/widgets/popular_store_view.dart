@@ -101,7 +101,7 @@ class PopularStoreView extends StatelessWidget {
                                 onTap: () {
                                   if(AuthHelper.isLoggedIn()) {
                                     isWished ? favouriteController.removeFromFavouriteList(storeList[index].id, true)
-                                        : favouriteController.addToFavouriteList(null, storeList[index], true);
+                                        : favouriteController.addToFavouriteList(null, storeList[index].id, true);
                                   }else {
                                     showCustomSnackBar('you_are_not_logged_in'.tr);
                                   }

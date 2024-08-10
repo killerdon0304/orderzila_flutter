@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sixam_mart/features/auth/widgets/web_registration_stepper_widget.dart';
 import 'package:sixam_mart/features/business/controllers/business_controller.dart';
 import 'package:sixam_mart/util/dimensions.dart';
 import 'package:sixam_mart/util/images.dart';
@@ -19,7 +18,7 @@ class SuccessWidget extends StatelessWidget {
           padding: const EdgeInsets.all(Dimensions.paddingSizeSmall),
           child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
 
-            businessController.businessIndex == 1 ? RegistrationStepperWidget(status: businessController.businessPlanStatus) : const SizedBox(height: Dimensions.paddingSizeLarge),
+            const SizedBox(height: Dimensions.paddingSizeLarge),
             SizedBox(height: context.height * 0.2),
 
             Image.asset(Images.checked, height: 90,width: 90),

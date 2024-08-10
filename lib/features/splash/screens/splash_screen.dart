@@ -82,40 +82,20 @@ class SplashScreenState extends State<SplashScreen> {
             Get.offNamed(RouteHelper.getUpdateRoute(AppConstants.appVersion < minimumVersion));
           }else {
             if(widget.body != null) {
-              if (widget.body!.notificationType == NotificationType.order) {
-                Get.offNamed(RouteHelper.getOrderDetailsRoute(widget.body!.orderId, fromNotification: true));
-              }else if(widget.body!.notificationType == NotificationType.general){
-                Get.offNamed(RouteHelper.getNotificationRoute(fromNotification: true));
-              }else {
-                Get.offNamed(RouteHelper.getChatRoute(notificationBody: widget.body, conversationID: widget.body!.conversationId, fromNotification: true));
-              }
+              _forNotificationRouteProcess();
             }else {
               if (AuthHelper.isLoggedIn()) {
-                Get.find<AuthController>().updateToken();
-                if (AddressHelper.getUserAddressFromSharedPref() != null) {
-                  if(Get.find<SplashController>().module != null) {
-                    await Get.find<FavouriteController>().getFavouriteList();
-                  }
-                  Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
-                } else {
-                  Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
-                }
+                _forLoggedInUserRouteProcess();
               } else {
                 if (Get.find<SplashController>().showIntro()!) {
-                  if(AppConstants.languages.length > 1) {
-                    Get.offNamed(RouteHelper.getLanguageRoute('splash'));
-                  }else {
-                    Get.offNamed(RouteHelper.getOnBoardingRoute());
-                  }
+                  _newlyRegisteredRouteProcess();
                 } else {
                   if(AuthHelper.isGuestLoggedIn()) {
-                    if (AddressHelper.getUserAddressFromSharedPref() != null) {
-                      Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
-                    } else {
-                      Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
-                    }
+                    _forGuestUserRouteProcess();
                   } else {
-                    Get.offNamed(RouteHelper.getSignInRoute(RouteHelper.splash));
+                    await Get.find<AuthController>().guestLogin();
+                    _forGuestUserRouteProcess();
+                    // Get.offNamed(RouteHelper.getSignInRoute(RouteHelper.splash));
                   }
                 }
               }
@@ -124,6 +104,44 @@ class SplashScreenState extends State<SplashScreen> {
         });
       }
     });
+  }
+
+  void _forNotificationRouteProcess() {
+    if (widget.body!.notificationType == NotificationType.order) {
+      Get.offNamed(RouteHelper.getOrderDetailsRoute(widget.body!.orderId, fromNotification: true));
+    }else if(widget.body!.notificationType == NotificationType.general){
+      Get.offNamed(RouteHelper.getNotificationRoute(fromNotification: true));
+    }else {
+      Get.offNamed(RouteHelper.getChatRoute(notificationBody: widget.body, conversationID: widget.body!.conversationId, fromNotification: true));
+    }
+  }
+
+  Future<void> _forLoggedInUserRouteProcess() async {
+    Get.find<AuthController>().updateToken();
+    if (AddressHelper.getUserAddressFromSharedPref() != null) {
+      if(Get.find<SplashController>().module != null) {
+        await Get.find<FavouriteController>().getFavouriteList();
+      }
+      Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+    } else {
+      Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
+    }
+  }
+
+  void _newlyRegisteredRouteProcess() {
+    if(AppConstants.languages.length > 1) {
+      Get.offNamed(RouteHelper.getLanguageRoute('splash'));
+    }else {
+      Get.offNamed(RouteHelper.getOnBoardingRoute());
+    }
+  }
+
+  void _forGuestUserRouteProcess() {
+    if (AddressHelper.getUserAddressFromSharedPref() != null) {
+      Get.offNamed(RouteHelper.getInitialRoute(fromSplash: true));
+    } else {
+      Get.find<LocationController>().navigateToLocationScreen('splash', offNamed: true);
+    }
   }
 
   @override

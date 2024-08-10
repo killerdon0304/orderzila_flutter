@@ -29,7 +29,7 @@ class _FooterViewState extends State<FooterView> {
   Widget build(BuildContext context) {
     return Column( mainAxisAlignment: MainAxisAlignment.start, children: [
       ConstrainedBox(
-        constraints: BoxConstraints(minHeight: (widget.visibility && ResponsiveHelper.isDesktop(context)) ? MediaQuery.of(context).size.height * widget.minHeight : MediaQuery.of(context).size.height *0.7) ,
+        constraints: BoxConstraints(minHeight: (widget.visibility && ResponsiveHelper.isDesktop(context)) ? MediaQuery.of(context).size.height * widget.minHeight : MediaQuery.of(context).size.height * widget.minHeight) ,
         child: widget.child,
       ),
 
@@ -96,7 +96,7 @@ class _FooterViewState extends State<FooterView> {
                           }
                         },
                         child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 2,vertical: 2),
+                          //margin: const EdgeInsets.symmetric(horizontal: 2,vertical: 0),
                           decoration: BoxDecoration(color: Theme.of(context).primaryColor, borderRadius: BorderRadius.circular(Dimensions.radiusDefault)),
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           child: !splashController.isLoading ? Text('subscribe'.tr, style: robotoRegular.copyWith(color: Colors.white, fontSize: Dimensions.fontSizeExtraSmall))
@@ -106,6 +106,7 @@ class _FooterViewState extends State<FooterView> {
                     }),
                   ]),
                 ),
+                const SizedBox(height: Dimensions.paddingSizeSmall),
 
                 GetBuilder<SplashController>(
                   builder: (splashController) {

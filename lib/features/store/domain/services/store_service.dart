@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/features/store/domain/models/cart_suggested_item_model.dart';
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 import 'package:sixam_mart/common/models/module_model.dart';
@@ -9,14 +10,15 @@ import 'package:sixam_mart/features/location/domain/models/zone_response_model.d
 import 'package:sixam_mart/features/store/domain/repositories/store_repository_interface.dart';
 import 'package:sixam_mart/features/store/domain/services/store_service_interface.dart';
 import 'package:sixam_mart/helper/address_helper.dart';
+import 'package:sixam_mart/util/app_constants.dart';
 
 class StoreService implements StoreServiceInterface {
   final StoreRepositoryInterface storeRepositoryInterface;
   StoreService({required this.storeRepositoryInterface});
 
   @override
-  Future<StoreModel?> getStoreList(int offset, String filterBy) async {
-    return await storeRepositoryInterface.getList(offset: offset, isStoreList: true, filterBy: filterBy);
+  Future<StoreModel?> getStoreList(int offset, String filterBy, String storeType) async {
+    return await storeRepositoryInterface.getList(offset: offset, isStoreList: true, filterBy: filterBy, type: storeType);
   }
 
   @override
@@ -83,6 +85,27 @@ class StoreService implements StoreServiceInterface {
       }
     }
     return moduleList;
+  }
+
+  @override
+  String filterRestaurantLinkUrl(String slug, Store store) {
+    List<String> routes = Get.currentRoute.split('?');
+    String replace = '';
+
+    if(AppConstants.useReactWebsite) {
+      if (slug.isNotEmpty) {
+        replace = '${routes[0]}/$slug?module_id=${store.moduleId}&module_type=${Get.find<SplashController>().module!.moduleType}&store_zone_id=${store.zoneId}&distance=${store.distance}';
+      } else {
+        replace = '${routes[0]}/${store.id}?module_id=${store.moduleId}&module_type=${Get.find<SplashController>().module!.moduleType}&store_zone_id=${store.zoneId}&distance=${store.distance}';
+      }
+    } else {
+      if(slug.isNotEmpty){
+        replace = '${routes[0]}?slug=$slug';
+      }else {
+        replace = '${routes[0]}?slug=${store.id}';
+      }
+    }
+    return replace;
   }
 
 }

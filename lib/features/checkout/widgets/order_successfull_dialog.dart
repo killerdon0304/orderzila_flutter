@@ -59,7 +59,11 @@ class _OrderSuccessfulDialogState extends State<OrderSuccessfulDialog> {
 
             if (!success && !Get.isDialogOpen! && orderController.trackModel!.orderStatus != 'canceled') {
               Future.delayed(const Duration(seconds: 1), () {
-                Get.dialog(PaymentFailedDialog(orderID: widget.orderID, isCashOnDelivery: _isCashOnDeliveryActive, orderAmount: total, maxCodOrderAmount: maximumCodOrderAmount, orderType: parcel ? 'parcel' : 'delivery'), barrierDismissible: false);
+                Get.dialog(PaymentFailedDialog(
+                  orderID: widget.orderID, isCashOnDelivery: _isCashOnDeliveryActive, orderAmount: total,
+                  maxCodOrderAmount: maximumCodOrderAmount, orderType: parcel ? 'parcel' : 'delivery',
+                  guestId: '',
+                ), barrierDismissible: false);
               });
             }
           }

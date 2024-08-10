@@ -37,6 +37,8 @@ class PlaceOrderBodyModel {
   int? _isBuyNow;
   String? _guestEmail;
   double? _extraPackagingAmount;
+  int? _createNewUser;
+  String? _password;
 
   PlaceOrderBodyModel({
     required List<OnlineCart> cart,
@@ -73,6 +75,8 @@ class PlaceOrderBodyModel {
     required int isBuyNow,
     required String? guestEmail,
     required double? extraPackagingAmount,
+    required int? createNewUser,
+    required String? password,
   }) {
     _cart = cart;
     _couponDiscountAmount = couponDiscountAmount;
@@ -108,6 +112,8 @@ class PlaceOrderBodyModel {
     _isBuyNow = isBuyNow;
     _guestEmail = guestEmail;
     _extraPackagingAmount = extraPackagingAmount;
+    _createNewUser = createNewUser;
+    _password = password;
   }
 
   List<OnlineCart>? get cart => _cart;
@@ -143,6 +149,8 @@ class PlaceOrderBodyModel {
   int? get isBuyNow => _isBuyNow;
   String? get guestEmail => _guestEmail;
   double? get extraPackagingAmount => _extraPackagingAmount;
+  int? get createNewUser => _createNewUser;
+  String? get password => _password;
 
   PlaceOrderBodyModel.fromJson(Map<String, dynamic> json) {
     if (json['cart'] != null) {
@@ -184,7 +192,9 @@ class PlaceOrderBodyModel {
     _guestId = json['guest_id'] != null ? int.parse(json['guest_id'].toString()) : null;
     _isBuyNow = int.parse(json['is_buy_now'].toString());
     _guestEmail = json['contact_person_email'];
-    _extraPackagingAmount = json['extra_packaging_amount'] != null ? double.parse(json['extra_packaging_amount'].toString()) : null;
+    _extraPackagingAmount = json['extra_packaging_amount'] != null && json['extra_packaging_amount'] != 'null' ? double.parse(json['extra_packaging_amount'].toString()) : null;
+    _createNewUser = json['create_new_user'] != null ? int.parse(json['create_new_user'].toString()) : null;
+    _password = json['password'];
   }
 
   Map<String, String> toJson() {
@@ -249,6 +259,10 @@ class PlaceOrderBodyModel {
       data['contact_person_email'] = _guestEmail!;
     }
     data['extra_packaging_amount'] = _extraPackagingAmount.toString();
+    data['create_new_user'] = _createNewUser.toString();
+    if (_password != null) {
+      data['password'] = _password!;
+    }
     return data;
   }
 }

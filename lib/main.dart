@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
-import 'package:meta_seo/meta_seo.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
 import 'package:sixam_mart/features/cart/controllers/cart_controller.dart';
 import 'package:sixam_mart/features/language/controllers/language_controller.dart';
@@ -53,15 +52,12 @@ Future<void> main() async {
     await Firebase.initializeApp(options: const FirebaseOptions(
         apiKey: "AIzaSyDFN-73p8zKVZbA0i5DtO215XzAb-xuGSE",
         authDomain: "ammart-8885e.firebaseapp.com",
-        databaseURL: "https://ammart-8885e-default-rtdb.firebaseio.com",
         projectId: "ammart-8885e",
         storageBucket: "ammart-8885e.appspot.com",
         messagingSenderId: "1000163153346",
         appId: "1:1000163153346:web:4f702a4b5adbd5c906b25b",
-        measurementId: "G-L1GNL2YV61"
     ));
-    MetaSEO().config();
-  }else if(GetPlatform.isAndroid) {
+  } else if(GetPlatform.isAndroid) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
         apiKey: "AIzaSyCic6Mw3RRPFcimXhwGidwhCN0tXY7HFFc",
@@ -70,7 +66,7 @@ Future<void> main() async {
         projectId: "ammart-8885e",
       ),
     );
-  }else {
+  } else {
     await Firebase.initializeApp();
   }
 

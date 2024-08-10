@@ -1,3 +1,4 @@
+import 'package:sixam_mart/features/item/domain/models/item_model.dart';
 
 class ReviewModel {
   int? id;
@@ -9,6 +10,7 @@ class ReviewModel {
   String? createdAt;
   String? updatedAt;
   String? reply;
+  Item? item;
 
   ReviewModel({
     this.id,
@@ -20,6 +22,7 @@ class ReviewModel {
     this.createdAt,
     this.updatedAt,
     this.reply,
+    this.item,
   });
 
   ReviewModel.fromJson(Map<String, dynamic> json) {
@@ -32,6 +35,7 @@ class ReviewModel {
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     reply = json['reply'];
+    item = json['item'] != null ? Item.fromJson(json['item']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -45,6 +49,9 @@ class ReviewModel {
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['reply'] = reply;
+    if (item != null) {
+      data['item'] = item!.toJson();
+    }
     return data;
   }
 }

@@ -46,6 +46,7 @@ class VisitAgainCard extends StatelessWidget {
 
             Flexible(child: Text(store.name ?? '', style: robotoBold, maxLines: 1, overflow: TextOverflow.ellipsis)),
 
+            if(store.ratingCount! > 0)
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Icon(Icons.star, size: 15, color: Theme.of(context).primaryColor),
               const SizedBox(width: Dimensions.paddingSizeExtraSmall),
@@ -144,7 +145,7 @@ class VisitAgainCard extends StatelessWidget {
             onTap: () {
               if(AuthHelper.isLoggedIn()) {
                 isWished ? favouriteController.removeFromFavouriteList(store.id, true)
-                    : favouriteController.addToFavouriteList(null, store, true);
+                    : favouriteController.addToFavouriteList(null, store.id, true);
               }else {
                 showCustomSnackBar('you_are_not_logged_in'.tr);
               }

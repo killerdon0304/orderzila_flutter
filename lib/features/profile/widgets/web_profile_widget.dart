@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/auth/controllers/auth_controller.dart';
+import 'package:sixam_mart/features/profile/widgets/notification_status_change_bottom_sheet.dart';
 import 'package:sixam_mart/features/splash/controllers/splash_controller.dart';
 import 'package:sixam_mart/common/controllers/theme_controller.dart';
 import 'package:sixam_mart/features/profile/controllers/profile_controller.dart';
@@ -166,7 +167,8 @@ class WebProfileWidget extends StatelessWidget {
                   return ProfileButtonWidget(
                     icon: Icons.notifications, title: 'notification'.tr,
                     isButtonActive: authController.notification, onTap: () {
-                    authController.setNotificationActive(!authController.notification);
+                    Get.dialog(const Dialog(child: NotificationStatusChangeBottomSheet()));
+                    // authController.setNotificationActive(!authController.notification);
                   },
                   );
                 }) : const SizedBox(),

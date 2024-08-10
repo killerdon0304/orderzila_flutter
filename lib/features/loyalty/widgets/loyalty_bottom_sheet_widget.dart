@@ -32,7 +32,7 @@ class _LoyaltyBottomSheetWidgetState extends State<LoyaltyBottomSheetWidget> {
   void initState() {
     super.initState();
 
-    _amountController.text = minimumExchangePoint!.toString();
+    _amountController.text = widget.amount;
   }
 
   @override

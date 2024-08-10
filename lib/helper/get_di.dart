@@ -11,9 +11,14 @@ import 'package:sixam_mart/features/business/domain/services/business_service.da
 import 'package:sixam_mart/features/business/domain/services/business_service_interface.dart';
 import 'package:sixam_mart/features/coupon/domain/repositories/coupon_repository.dart';
 import 'package:sixam_mart/features/coupon/domain/repositories/coupon_repository_interface.dart';
+import 'package:sixam_mart/features/home/controllers/advertisement_controller.dart';
 import 'package:sixam_mart/features/home/controllers/home_controller.dart';
+import 'package:sixam_mart/features/home/domain/repositories/advertisement_repository.dart';
+import 'package:sixam_mart/features/home/domain/repositories/advertisement_repository_interface.dart';
 import 'package:sixam_mart/features/home/domain/repositories/home_repository.dart';
 import 'package:sixam_mart/features/home/domain/repositories/home_repository_interface.dart';
+import 'package:sixam_mart/features/home/domain/services/advertisement_service.dart';
+import 'package:sixam_mart/features/home/domain/services/advertisement_service_interface.dart';
 import 'package:sixam_mart/features/home/domain/services/home_service.dart';
 import 'package:sixam_mart/features/home/domain/services/home_service_interface.dart';
 import 'package:sixam_mart/features/taxi_booking/controllers/booking_checkout_controller.dart';
@@ -289,6 +294,9 @@ Future<Map<String, Map<String, String>>> init() async {
   BusinessRepoInterface businessRepoInterface = BusinessRepo(apiClient: Get.find());
   Get.lazyPut(() => businessRepoInterface);
 
+  AdvertisementRepositoryInterface advertisementRepositoryInterface = AdvertisementRepository(apiClient: Get.find());
+  Get.lazyPut(() => advertisementRepositoryInterface);
+
   /// Service Interface
   CheckoutServiceInterface checkoutServiceInterface = CheckoutService(checkoutRepositoryInterface: Get.find());
   Get.lazyPut(() => checkoutServiceInterface);
@@ -388,6 +396,9 @@ Future<Map<String, Map<String, String>>> init() async {
   BusinessServiceInterface businessServiceInterface = BusinessService(businessRepoInterface: Get.find());
   Get.lazyPut(() => businessServiceInterface);
 
+  AdvertisementServiceInterface advertisementServiceInterface = AdvertisementService(advertisementRepositoryInterface: Get.find());
+  Get.lazyPut(() => advertisementServiceInterface);
+
 
   /// Controller
   Get.lazyPut(() => ThemeController(sharedPreferences: Get.find()));
@@ -428,6 +439,7 @@ Future<Map<String, Map<String, String>>> init() async {
   Get.lazyPut(() => VerificationController(verificationServiceInterface: Get.find()));
   Get.lazyPut(() => BrandsController(brandsServiceInterface: Get.find()));
   Get.lazyPut(() => BusinessController(businessServiceInterface: Get.find()));
+  Get.lazyPut(() => AdvertisementController(advertisementServiceInterface: Get.find()));
 
   /// Retrieving localized data
   Map<String, Map<String, String>> languages = {};

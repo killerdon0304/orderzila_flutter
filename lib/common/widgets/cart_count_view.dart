@@ -8,7 +8,8 @@ import 'package:sixam_mart/util/styles.dart';
 class CartCountView extends StatelessWidget {
   final Item item;
   final Widget? child;
-  const CartCountView({super.key, required this.item, this.child});
+  final int? index;
+  const CartCountView({super.key, required this.item, this.child, this.index = -1});
 
   @override
   Widget build(BuildContext context) {
@@ -26,6 +27,7 @@ class CartCountView extends StatelessWidget {
             InkWell(
               onTap: cartController.isLoading ? null : () {
                 if (cartController.cartList[cartIndex].quantity! > 1) {
+                  cartController.setDirectlyAddToCartIndex(index);
                   cartController.setQuantity(false, cartIndex, cartController.cartList[cartIndex].stock, cartController.cartList[cartIndex].item!.quantityLimit);
                 }else {
                   cartController.removeFromCart(cartIndex);
@@ -46,14 +48,16 @@ class CartCountView extends StatelessWidget {
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: Dimensions.paddingSizeSmall),
-              child: !cartController.isLoading ? Text(
-                cartQty.toString(),
+              child: cartController.isLoading && cartController.directAddCartItemIndex == index
+                  ? SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Theme.of(context).cardColor))
+                  : Text(cartQty.toString(),
                 style: robotoMedium.copyWith(fontSize: Dimensions.fontSizeSmall, color: Theme.of(context).cardColor),
-              ) : SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Theme.of(context).cardColor)),
+              ) ,
             ),
 
             InkWell(
               onTap: cartController.isLoading ? null : () {
+                cartController.setDirectlyAddToCartIndex(index);
                 cartController.setQuantity(true, cartIndex, cartController.cartList[cartIndex].stock, cartController.cartList[cartIndex].quantityLimit);
               },
               child: Container(

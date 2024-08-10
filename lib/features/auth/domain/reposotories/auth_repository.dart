@@ -39,9 +39,11 @@ class AuthRepository implements AuthRepositoryInterface{
   @override
   Future<Response> login({String? phone, String? password}) async {
     String guestId = getSharedPrefGuestId();
+    String? deviceToken = await saveDeviceToken();
     Map<String, String> data = {
       "phone": phone!,
       "password": password!,
+      "cm_firebase_token": deviceToken!,
     };
     if(guestId.isNotEmpty) {
       data.addAll({"guest_id": guestId});
@@ -52,7 +54,7 @@ class AuthRepository implements AuthRepositoryInterface{
   @override
   Future<ResponseModel> guestLogin() async {
     ResponseModel responseModel;
-    String? deviceToken = await _saveDeviceToken();
+    String? deviceToken = await saveDeviceToken();
     Response response = await apiClient.postData(AppConstants.guestLoginUri, {'fcm_token': deviceToken});
     if (response.statusCode == 200) {
       await saveSharedPrefGuestId(response.body['guest_id'].toString());
@@ -103,10 +105,10 @@ class AuthRepository implements AuthRepositoryInterface{
           criticalAlert: false, provisional: false, sound: true,
         );
         if(settings.authorizationStatus == AuthorizationStatus.authorized) {
-          deviceToken = await _saveDeviceToken();
+          deviceToken = await saveDeviceToken();
         }
       }else {
-        deviceToken = await _saveDeviceToken();
+        deviceToken = await saveDeviceToken();
       }
       if(!GetPlatform.isWeb) {
         FirebaseMessaging.instance.subscribeToTopic(AppConstants.topic);
@@ -115,7 +117,8 @@ class AuthRepository implements AuthRepositoryInterface{
     return await apiClient.postData(AppConstants.tokenUri, {"_method": "put", "cm_firebase_token": notificationDeviceToken.isNotEmpty ? notificationDeviceToken : deviceToken}, handleError: false);
   }
 
-  Future<String?> _saveDeviceToken() async {
+  @override
+  Future<String?> saveDeviceToken() async {
     String? deviceToken = '@';
     if(!GetPlatform.isWeb) {
       try {
@@ -162,7 +165,7 @@ class AuthRepository implements AuthRepositoryInterface{
   }
 
   @override
-  bool clearSharedData() {
+  Future<bool> clearSharedData() async {
     if(!GetPlatform.isWeb) {
       FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
       apiClient.postData(AppConstants.tokenUri, {"_method": "put", "cm_firebase_token": '@'}, handleError: false);
@@ -170,9 +173,17 @@ class AuthRepository implements AuthRepositoryInterface{
     sharedPreferences.remove(AppConstants.token);
     sharedPreferences.remove(AppConstants.guestId);
     sharedPreferences.setStringList(AppConstants.cartList, []);
-    sharedPreferences.remove(AppConstants.userAddress);
+    // sharedPreferences.remove(AppConstants.userAddress);
     apiClient.token = null;
-    apiClient.updateHeader(null, null, null, null, null, null, null);
+    // apiClient.updateHeader(null, null, null, null, null, null, null);
+    await guestLogin();
+    if(sharedPreferences.getString(AppConstants.userAddress) != null){
+      AddressModel? addressModel = AddressModel.fromJson(jsonDecode(sharedPreferences.getString(AppConstants.userAddress)!));
+      apiClient.updateHeader(
+        null, addressModel.zoneIds, null, sharedPreferences.getString(AppConstants.languageCode), null,
+        addressModel.latitude, addressModel.longitude,
+      );
+    }
     return true;
   }
 
@@ -251,12 +262,12 @@ class AuthRepository implements AuthRepositoryInterface{
   }
 
   @override
-  void setNotificationActive(bool isActive) {
+  Future<void> setNotificationActive(bool isActive) async {
     if(isActive) {
-      updateToken();
+      await updateToken();
     }else {
       if(!GetPlatform.isWeb) {
-        updateToken(notificationDeviceToken: '@');
+        await updateToken(notificationDeviceToken: '@');
         FirebaseMessaging.instance.unsubscribeFromTopic(AppConstants.topic);
         if(isLoggedIn()) {
           FirebaseMessaging.instance.unsubscribeFromTopic('zone_${AddressHelper.getUserAddressFromSharedPref()!.zoneId}_customer');

@@ -1,4 +1,6 @@
 import 'package:sixam_mart/features/item/domain/models/item_model.dart';
+import 'package:sixam_mart/features/search/domain/models/popular_categories_model.dart';
+import 'package:sixam_mart/features/search/domain/models/search_suggestion_model.dart';
 import 'package:sixam_mart/features/store/domain/models/store_model.dart';
 import 'package:get/get.dart';
 import 'package:sixam_mart/features/search/domain/services/search_service_interface.dart';
@@ -85,6 +87,12 @@ class SearchController extends GetxController implements GetxService {
   
   String? _searchHomeText = '';
   String? get searchHomeText => _searchHomeText;
+
+  SearchSuggestionModel? _searchSuggestionModel;
+  SearchSuggestionModel? get searchSuggestionModel => _searchSuggestionModel;
+
+  List<PopularCategoryModel?>? _popularCategoryList;
+  List<PopularCategoryModel?>? get popularCategoryList => _popularCategoryList;
 
   void toggleVeg() {
     _veg = !_veg;
@@ -309,6 +317,26 @@ class SearchController extends GetxController implements GetxService {
 
   void clearSearchHomeText() {
     _searchHomeText = '';
+    update();
+  }
+
+  Future<List<String>> getSearchSuggestions(String searchText) async {
+    List<String> items = <String>[];
+    _searchSuggestionModel = await searchServiceInterface.getSearchSuggestions(searchText);
+    if(_searchSuggestionModel != null) {
+      for (var item in _searchSuggestionModel!.items!) {
+        items.add(item.name!);
+      }
+      for (var store in _searchSuggestionModel!.stores!) {
+        items.add(store.name!);
+      }
+    }
+    return items;
+  }
+
+  Future<void> getPopularCategories() async {
+    _popularCategoryList = null;
+    _popularCategoryList = await searchServiceInterface.getPopularCategories();
     update();
   }
   

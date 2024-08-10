@@ -44,6 +44,18 @@ class LanguageRepository implements LanguageRepositoryInterface {
   }
 
   @override
+  void saveCacheLanguage(Locale locale) {
+    sharedPreferences.setString(AppConstants.cacheLanguageCode, locale.languageCode);
+    sharedPreferences.setString(AppConstants.cacheCountryCode, locale.countryCode!);
+  }
+
+  @override
+  Locale getCacheLocaleFromSharedPref() {
+    return Locale(sharedPreferences.getString(AppConstants.cacheLanguageCode) ?? AppConstants.languages[0].languageCode!,
+        sharedPreferences.getString(AppConstants.cacheCountryCode) ?? AppConstants.languages[0].countryCode);
+  }
+
+  @override
   Future add(value) {
     throw UnimplementedError();
   }

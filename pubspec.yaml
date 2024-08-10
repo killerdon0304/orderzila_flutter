@@ -49,16 +49,18 @@ dependencies:
   intl: ^0.19.0
   just_the_tooltip: ^0.0.12
   flutter_slidable: ^3.0.0
-  meta_seo: ^3.0.5
   animated_flip_counter: ^0.2.5
   youtube_player_iframe: ^4.0.4
   card_swiper: ^3.0.1
   audioplayers: ^5.2.1
   firebase_crashlytics: ^3.5.7
-  video_player: ^2.8.1
+  video_player: ^2.8.6
   flutter_svg: ^2.0.10+1
   flutter_widget_from_html_core: ^0.14.12
   image: ^4.2.0
+  smooth_page_indicator: ^1.1.0
+  chewie: ^1.8.1
+  location: ^7.0.0
 
 dev_dependencies:
   flutter_test:

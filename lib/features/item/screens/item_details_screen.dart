@@ -27,7 +27,8 @@ import 'package:sixam_mart/features/item/widgets/item_title_view_widget.dart';
 class ItemDetailsScreen extends StatefulWidget {
   final Item? item;
   final bool inStorePage;
-  const ItemDetailsScreen({super.key, required this.item, required this.inStorePage});
+  final bool? isCampaign;
+  const ItemDetailsScreen({super.key, required this.item, required this.inStorePage, this.isCampaign});
 
   @override
   State<ItemDetailsScreen> createState() => _ItemDetailsScreenState();
@@ -134,7 +135,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                     child: Center(child: SizedBox(width: Dimensions.webMaxWidth, child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        ItemImageViewWidget(item: itemController.item),
+                        ItemImageViewWidget(item: itemController.item, isCampaign: widget.isCampaign ?? false),
                         const SizedBox(height: 20),
 
                         Builder(
@@ -309,7 +310,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                     cartController.clearCartOnline().then((success) async {
                                       if(success) {
                                         await cartController.addToCartOnline(cart!);
-                                        itemController.setExistInCart(widget.item);
+                                        itemController.setExistInCart(widget.item, null);
                                         showCartSnackBar();
                                       }
                                     });
@@ -320,7 +321,7 @@ class _ItemDetailsScreenState extends State<ItemDetailsScreen> {
                                 if(itemController.cartIndex == -1) {
                                   await cartController.addToCartOnline(cart!).then((success) {
                                     if(success){
-                                      itemController.setExistInCart(widget.item);
+                                      itemController.setExistInCart(widget.item, null);
                                       showCartSnackBar();
                                       _key.currentState!.shake();
                                     }

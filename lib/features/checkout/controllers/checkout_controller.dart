@@ -168,9 +168,11 @@ class CheckoutController extends GetxController implements GetxService {
     }
   }
 
-  void changeDigitalPaymentName(String name){
+  void changeDigitalPaymentName(String name, {bool willUpdate = true}){
     _digitalPaymentName = name;
-    update();
+    if(willUpdate) {
+      update();
+    }
   }
 
   void setOrderType(String? type, {bool notify = true}) {
@@ -388,13 +390,18 @@ class CheckoutController extends GetxController implements GetxService {
     _isLoading = true;
     update();
     String orderID = '';
+    String userID = '';
     Response response = await checkoutServiceInterface.placeOrder(placeOrderBody, multiParts);
     _isLoading = false;
     if (response.statusCode == 200) {
       String? message = response.body['message'];
       orderID = response.body['order_id'].toString();
+      if(response.body['user_id'] != null) {
+        userID = response.body['user_id'].toString();
+      }
+
       if(!isOfflinePay) {
-        callback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber!);
+        callback(true, message, orderID, zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber!, userID);
       } else {
         Get.find<CartController>().getCartDataOnline();
       }
@@ -404,8 +411,9 @@ class CheckoutController extends GetxController implements GetxService {
         print('-------- Order placed successfully $orderID ----------');
       }
     } else {
+
       if(!isOfflinePay) {
-        callback(false, response.statusText, '-1', zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber);
+        callback(false, response.statusText, '-1', zoneID, amount, maximumCodOrderAmount, fromCart, isCashOnDeliveryActive, placeOrderBody.contactPersonNumber, userID);
       } else {
         showCustomSnackBar(response.statusText);
       }
@@ -428,14 +436,14 @@ class CheckoutController extends GetxController implements GetxService {
     if (response.statusCode == 200) {
       String? message = response.body['message'];
       String orderID = response.body['order_id'].toString();
-      callback(true, message, orderID, zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null);
+      callback(true, message, orderID, zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null, '');
       _orderAttachment = null;
       _rawAttachment = null;
       if (kDebugMode) {
         print('-------- Order placed successfully $orderID ----------');
       }
     } else {
-      callback(false, response.statusText, '-1', zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null);
+      callback(false, response.statusText, '-1', zoneID, orderAmount, maxCodAmount, fromCart, isCashOnDeliveryActive, null, '');
     }
     update();
   }
@@ -443,7 +451,8 @@ class CheckoutController extends GetxController implements GetxService {
   void callback(
       bool isSuccess, String? message, String orderID, int? zoneID, double amount,
       double? maximumCodOrderAmount, bool fromCart, bool isCashOnDeliveryActive, String? contactNumber,
-      ) async {
+      String userID) async {
+
     if(isSuccess) {
       if(fromCart) {
         Get.find<CartController>().clearCartList();
@@ -464,14 +473,14 @@ class CheckoutController extends GetxController implements GetxService {
           String? hostname = html.window.location.hostname;
           String protocol = html.window.location.protocol;
           String selectedUrl;
-          selectedUrl = '${AppConstants.baseUrl}/payment-mobile?order_id=$orderID&&customer_id=${Get.find<ProfileController>().userInfoModel?.id ?? AuthHelper.getGuestId()}'
+          selectedUrl = '${AppConstants.baseUrl}/payment-mobile?order_id=$orderID&&customer_id=${Get.find<ProfileController>().userInfoModel?.id ?? (userID.isNotEmpty ? userID : AuthHelper.getGuestId())}'
               '&payment_method=$digitalPaymentName&payment_platform=web&&callback=$protocol//$hostname${RouteHelper.orderSuccess}?id=$orderID&status=';
 
           html.window.open(selectedUrl,"_self");
         } else{
           Get.offNamed(RouteHelper.getPaymentRoute(
-            orderID, Get.find<ProfileController>().userInfoModel?.id ?? 0, orderType, amount,
-            isCashOnDeliveryActive, digitalPaymentName, guestId: AuthHelper.getGuestId(),
+            orderID, Get.find<ProfileController>().userInfoModel?.id ?? (userID.isNotEmpty ? int.parse(userID) : 0), orderType, amount,
+            isCashOnDeliveryActive, digitalPaymentName, guestId: userID.isNotEmpty ? userID : AuthHelper.getGuestId(),
             contactNumber: contactNumber,
           ));
         }
@@ -482,9 +491,9 @@ class CheckoutController extends GetxController implements GetxService {
         }
         if (ResponsiveHelper.isDesktop(Get.context) && AuthHelper.isLoggedIn()){
           Get.offNamed(RouteHelper.getInitialRoute());
-          Future.delayed(const Duration(seconds: 2) , () => Get.dialog(Center(child: SizedBox(height: 350, width : 500, child: OrderSuccessfulDialog( orderID: orderID)))));
+          Future.delayed(const Duration(seconds: 2) , () => Get.dialog(Center(child: SizedBox(height: 350, width : 500, child: OrderSuccessfulDialog(orderID: orderID)))));
         } else {
-          Get.offNamed(RouteHelper.getOrderSuccessRoute(orderID, contactNumber));
+          Get.offNamed(RouteHelper.getOrderSuccessRoute(orderID, contactNumber, createAccount: _isCreateAccount));
         }
       }
       clearPrevData();
@@ -537,6 +546,16 @@ class CheckoutController extends GetxController implements GetxService {
       }
     }
     if(notify) {
+      update();
+    }
+  }
+
+  bool _isCreateAccount = false;
+  bool get isCreateAccount => _isCreateAccount;
+
+  void toggleCreateAccount({bool willUpdate = true}){
+    _isCreateAccount = !_isCreateAccount;
+    if(willUpdate) {
       update();
     }
   }

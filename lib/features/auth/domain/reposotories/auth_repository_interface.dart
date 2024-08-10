@@ -14,7 +14,7 @@ abstract class AuthRepositoryInterface extends RepositoryInterface{
   String getSharedPrefGuestId();
   Future<bool> clearSharedPrefGuestId();
   bool isGuestLoggedIn();
-  bool clearSharedData();
+  Future<bool> clearSharedData();
   Future<ResponseModel> guestLogin();
   Future<Response> loginWithSocialMedia(SocialLogInBody socialLogInBody, int timeout);
   Future<Response> registerWithSocialMedia(SocialLogInBody socialLogInBody);
@@ -34,5 +34,6 @@ abstract class AuthRepositoryInterface extends RepositoryInterface{
   String getDmTipIndex();
   Future<bool> saveEarningPoint(String point);
   String getEarningPint();
-  void setNotificationActive(bool isActive);
+  Future<void> setNotificationActive(bool isActive);
+  Future<String?> saveDeviceToken();
 }

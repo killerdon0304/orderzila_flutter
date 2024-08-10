@@ -120,7 +120,7 @@ class ModuleView extends StatelessWidget {
                       fromAddress: false,
                       onTap: () {
                         if(AddressHelper.getUserAddressFromSharedPref()!.id != addressList[index]!.id) {
-                          Get.dialog(const CustomLoader(), barrierDismissible: false);
+                          Get.dialog(const CustomLoaderWidget(), barrierDismissible: false);
                           Get.find<LocationController>().saveAddressAndNavigate(
                             addressList[index], false, null, false, ResponsiveHelper.isDesktop(context),
                           );

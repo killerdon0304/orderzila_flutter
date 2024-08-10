@@ -25,6 +25,7 @@ class PaymentSection extends StatelessWidget {
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text(storeId != null ? 'payment_method'.tr : 'choose_payment_method'.tr, style: robotoMedium),
 
+
         storeId == null && !ResponsiveHelper.isDesktop(context) ? InkWell(
           onTap: (){
             Get.bottomSheet(
@@ -41,6 +42,7 @@ class PaymentSection extends StatelessWidget {
       ]),
 
       !ResponsiveHelper.isDesktop(context) ? const Divider() : const SizedBox(height: Dimensions.paddingSizeSmall),
+      SizedBox(height: !ResponsiveHelper.isDesktop(context) ? Dimensions.paddingSizeSmall : 0),
 
       Container(
         decoration: ResponsiveHelper.isDesktop(context) ? BoxDecoration(
@@ -105,7 +107,7 @@ class PaymentSection extends StatelessWidget {
 
                 checkoutController.paymentMethodIndex == -1 && !ResponsiveHelper.isDesktop(context) ? Padding(
                   padding: const EdgeInsets.only(left: Dimensions.paddingSizeExtraSmall),
-                  child: Icon(Icons.error, size: 16, color: Theme.of(context).colorScheme.error),
+                  child: Icon(Icons.warning_rounded, size: 16, color: Theme.of(context).colorScheme.error),
                 ) : const SizedBox(),
               ])
             ),
