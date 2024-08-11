@@ -1,6 +1,6 @@
 {
-    "name": "6amMart",
-    "short_name": "6amMart",
+    "name": "OrderZila",
+    "short_name": "OrderZila",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#2A9849",

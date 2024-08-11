@@ -4,16 +4,16 @@ import 'package:sixam_mart/features/language/domain/models/language_model.dart';
 import 'package:sixam_mart/util/images.dart';
 
 class AppConstants {
-  static const String appName = '6amMart';
+  static const String appName = 'OrderZila';
   static const double appVersion = 2.9; ///Flutter Version: 3.22.3
 
   static const String fontFamily = 'Roboto';
   static const bool payInWevView = false;
   static const int balanceInputLen = 10;
-  static const String webHostedUrl = 'https://6ammart-web.6amtech.com';
+  static const String webHostedUrl = 'https://orderzila.com';
   static const bool useReactWebsite = false;
 
-  static const String baseUrl = 'https://6ammart-admin.6amtech.com';
+  static const String baseUrl = 'https://orderzila.com/zila';
   static const String categoryUri = '/api/v1/categories';
   static const String bannerUri = '/api/v1/banners';
   static const String storeItemUri = '/api/v1/items/latest';
@@ -162,31 +162,31 @@ class AppConstants {
   static const String removeItemCartUri = '/api/v1/customer/cart/remove-item';
 
   /// Shared Key
-  static const String theme = '6ammart_theme';
-  static const String token = '6ammart_token';
-  static const String countryCode = '6ammart_country_code';
-  static const String languageCode = '6ammart_language_code';
+  static const String theme = 'OrderZila_theme';
+  static const String token = 'OrderZila_token';
+  static const String countryCode = 'OrderZila_country_code';
+  static const String languageCode = 'OrderZila_language_code';
   static const String cacheCountryCode = 'cache_country_code';
   static const String cacheLanguageCode = 'cache_language_code';
-  static const String cartList = '6ammart_cart_list';
-  static const String userPassword = '6ammart_user_password';
-  static const String userAddress = '6ammart_user_address';
-  static const String userNumber = '6ammart_user_number';
-  static const String userCountryCode = '6ammart_user_country_code';
-  static const String notification = '6ammart_notification';
-  static const String searchHistory = '6ammart_search_history';
-  static const String intro = '6ammart_intro';
-  static const String notificationCount = '6ammart_notification_count';
-  static const String dmTipIndex = '6ammart_dm_tip_index';
-  static const String earnPoint = '6ammart_earn_point';
-  static const String acceptCookies = '6ammart_accept_cookies';
-  static const String suggestedLocation = '6ammart_suggested_location';
-  static const String walletAccessToken = '6ammart_wallet_access_token';
-  static const String guestId = '6ammart_guest_id';
-  static const String guestNumber = '6ammart_guest_number';
-  static const String referBottomSheet = '6ammart_reffer_bottomsheet_show';
-  static const String dmRegisterSuccess = '6ammart_dm_registration_success';
-  static const String isRestaurantRegister = '6ammart_store_registration';
+  static const String cartList = 'OrderZila_cart_list';
+  static const String userPassword = 'OrderZila_user_password';
+  static const String userAddress = 'OrderZila_user_address';
+  static const String userNumber = 'OrderZila_user_number';
+  static const String userCountryCode = 'OrderZila_user_country_code';
+  static const String notification = 'OrderZila_notification';
+  static const String searchHistory = 'OrderZila_search_history';
+  static const String intro = 'OrderZila_intro';
+  static const String notificationCount = 'OrderZila_notification_count';
+  static const String dmTipIndex = 'OrderZila_dm_tip_index';
+  static const String earnPoint = 'OrderZila_earn_point';
+  static const String acceptCookies = 'OrderZila_accept_cookies';
+  static const String suggestedLocation = 'OrderZila_suggested_location';
+  static const String walletAccessToken = 'OrderZila_wallet_access_token';
+  static const String guestId = 'OrderZila_guest_id';
+  static const String guestNumber = 'OrderZila_guest_number';
+  static const String referBottomSheet = 'OrderZila_reffer_bottomsheet_show';
+  static const String dmRegisterSuccess = 'OrderZila_dm_registration_success';
+  static const String isRestaurantRegister = 'OrderZila_store_registration';
 
   static const String topic = 'all_zone_customer';
   static const String zoneId = 'zoneId';
@@ -246,10 +246,12 @@ class AppConstants {
 
   static List<LanguageModel> languages = [
     LanguageModel(imageUrl: Images.english, languageName: 'English', countryCode: 'US', languageCode: 'en'),
-    LanguageModel(imageUrl: Images.arabic, languageName: 'عربى', countryCode: 'SA', languageCode: 'ar'),
-    LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
-    LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
+    LanguageModel(imageUrl: Images.hindi, languageName: 'Hindi', countryCode: 'IN', languageCode: 'hi'),
+    
   ];
+  // LanguageModel(imageUrl: Images.arabic, languageName: 'عربى', countryCode: 'SA', languageCode: 'ar'),
+    // LanguageModel(imageUrl: Images.spanish, languageName: 'Spanish', countryCode: 'ES', languageCode: 'es'),
+    // LanguageModel(imageUrl: Images.bengali, languageName: 'Bengali', countryCode: 'BN', languageCode: 'bn'),
 
   static List<String> joinDropdown = [
     'join_us',

@@ -50,20 +50,20 @@ Future<void> main() async {
 
   if(GetPlatform.isWeb){
     await Firebase.initializeApp(options: const FirebaseOptions(
-        apiKey: "AIzaSyDFN-73p8zKVZbA0i5DtO215XzAb-xuGSE",
-        authDomain: "ammart-8885e.firebaseapp.com",
-        projectId: "ammart-8885e",
-        storageBucket: "ammart-8885e.appspot.com",
-        messagingSenderId: "1000163153346",
-        appId: "1:1000163153346:web:4f702a4b5adbd5c906b25b",
+        apiKey: "AIzaSyCu7A0xTBo4cfsHT7RbbaF2_ce3tGR-5sc",
+        authDomain: "orderzila.firebaseapp.com",
+        projectId: "orderzila",
+        storageBucket: "orderzila.appspot.com",
+        messagingSenderId: "42022517446",
+        appId: "1:42022517446:web:ab03b83534d45e740a35c7",
     ));
   } else if(GetPlatform.isAndroid) {
     await Firebase.initializeApp(
       options: const FirebaseOptions(
-        apiKey: "AIzaSyCic6Mw3RRPFcimXhwGidwhCN0tXY7HFFc",
-        appId: "1:1000163153346:android:9d8caf29b912e11606b25b",
-        messagingSenderId: "1000163153346",
-        projectId: "ammart-8885e",
+        apiKey: "AIzaSyBTl8ZcEgeEPXUgBxAJmChnzB7rgu059Eg",
+        appId: "1:42022517446:android:d67cac98f2a207200a35c7",
+        messagingSenderId: "42022517446",
+        projectId: "orderzila",
       ),
     );
   } else {
